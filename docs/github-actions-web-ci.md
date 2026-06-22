@@ -1,6 +1,6 @@
 # Running the Web CI workflow
 
-The `Web CI` workflow verifies the web application by installing dependencies and running:
+The `Web CI` workflow avoids third-party Marketplace actions because this repository restricts workflows to actions owned by `woobebox`. It checks out code with shell `git` commands, verifies the runner Node.js tooling, installs dependencies, and runs:
 
 - `npm run typecheck`
 - `npm run lint`
@@ -53,3 +53,14 @@ gh run watch
 ## What Claude can and cannot do
 
 Claude can prepare the workflow file and commit it. Claude can trigger it only if the environment provides authenticated GitHub access, for example a configured `gh` CLI or an integration that can push branches/open pull requests. Without that access, a human must push the branch, open the pull request, or click **Run workflow** in GitHub.
+
+
+## Organization action allow-list note
+
+If GitHub reports an error such as:
+
+```text
+The action actions/checkout@v4 is not allowed because all actions must be from a repository owned by woobebox.
+```
+
+that means the repository or organization disallows Marketplace actions, including official `actions/*` actions. This workflow is written without `uses: actions/checkout` or `uses: actions/setup-node`; it uses shell commands instead. If you later want to use Marketplace actions, a repository or organization admin must change the GitHub Actions policy allow-list.

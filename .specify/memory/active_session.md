@@ -1,11 +1,18 @@
 # Current Session Progress
 
 - **Current Active Feature**: `001-local-first-pwa-inventory`
-- **Latest Verified Action**: Added manual GitHub Actions dispatch support and Claude/human instructions for running the Web CI workflow on 2026-06-22.
-- **Current Blockers**: Local dependency installation remains blocked by registry/network policy returning `403 Forbidden` for public npm packages.
-- **Next Best Action**: Push the branch/open a PR or manually dispatch `Web CI` from GitHub Actions; once CI passes, continue with US1 tasks beginning at T025.
+- **Latest Verified Action**: Updated Web CI to avoid disallowed Marketplace actions by replacing `actions/checkout` and `actions/setup-node` with shell-based checkout/tool verification on 2026-06-22.
+- **Current Blockers**: Local dependency installation remains blocked by registry/network policy returning `403 Forbidden` for public npm packages; GitHub CI now no longer depends on non-`woobebox` actions.
+- **Next Best Action**: Re-run `Web CI` from GitHub Actions; if npm registry access succeeds on the runner, review typecheck/lint/test/build results and continue with US1 tasks beginning at T025.
 
 ## Session Log
+
+### 2026-06-22 Web CI Organization Action Policy Fix
+
+- **Completed Action**: Reworked `.github/workflows/web-ci.yml` to remove `uses: actions/checkout@v4` and `uses: actions/setup-node@v4` because the `woobebox/treasure-box-inventory` repository only allows actions from repositories owned by `woobebox`. The workflow now performs checkout with shell `git` commands and verifies the preinstalled runner Node.js/npm versions before install/typecheck/lint/test/build. Updated `docs/github-actions-web-ci.md` with the organization allow-list explanation.
+- **Verification**: `git diff --check` passed.
+- **Current Blockers**: local npm registry access remains forbidden in this environment.
+- **Next Best Action**: Re-run `Web CI` in GitHub Actions.
 
 ### 2026-06-22 Web CI Dispatch Guidance
 

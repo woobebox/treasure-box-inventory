@@ -18,6 +18,9 @@ on:
       - 'package-lock.json'
       - '.github/workflows/web-ci.yml'
 
+permissions:
+  contents: read
+
 jobs:
   web:
     name: Typecheck, lint, test, and build web app
@@ -28,17 +31,20 @@ jobs:
     env:
       NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout repository without external actions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git init .
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git fetch --depth=1 origin "${GITHUB_SHA}"
+          git checkout --detach FETCH_HEAD
+          git remote set-url origin "https://github.com/${GITHUB_REPOSITORY}.git"
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            apps/web/package-lock.json
+      - name: Verify runner Node.js tooling
+        run: |
+          node --version
+          npm --version
 
       - name: Install dependencies
         run: |
