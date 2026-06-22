@@ -148,3 +148,10 @@
 - **Verification**: `npm run lint` still cannot complete locally because `@eslint/js` is not installed in this environment. `npm run typecheck` still fails locally before project checks because `vite/client` and `node` type definitions are unavailable. `git diff --check` passed.
 - **Current Blockers**: local npm dependencies remain unavailable due to npm registry `403 Forbidden` for `@eslint/js`.
 - **Next Best Action**: Re-run Web CI where dependencies are available to confirm lint passes end-to-end.
+
+### 2026-06-22 App Test IndexedDB Follow-up
+
+- **Completed Action**: Fixed the app shell test failure caused by `HomePage` opening Dexie during render without an IndexedDB polyfill by loading `fake-indexeddb/auto` from the shared Vitest setup file.
+- **Verification**: `npm run test` still cannot complete locally because `vitest` is not installed in this environment. `git diff --check` passed.
+- **Current Blockers**: local npm dependencies remain unavailable due to npm registry access restrictions.
+- **Next Best Action**: Re-run Web CI where dependencies are available to confirm the full Vitest suite passes.
