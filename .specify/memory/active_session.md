@@ -1,11 +1,32 @@
 # Current Session Progress
 
 - **Current Active Feature**: `001-local-first-pwa-inventory`
-- **Latest Verified Action**: Updated `plan.md`, `tasks.md`, and Spec Kit design artifacts after clarification; `git diff --check`, setup scripts, agent-context hook, and task checklist format validation passed on 2026-06-22.
-- **Current Blockers**: none
-- **Next Best Action**: begin implementation with Phase 1 setup tasks, starting at T007 to scaffold the Vite React TypeScript app under `apps/web/`.
+- **Latest Verified Action**: Added manual GitHub Actions dispatch support and Claude/human instructions for running the Web CI workflow on 2026-06-22.
+- **Current Blockers**: Local dependency installation remains blocked by registry/network policy returning `403 Forbidden` for public npm packages.
+- **Next Best Action**: Push the branch/open a PR or manually dispatch `Web CI` from GitHub Actions; once CI passes, continue with US1 tasks beginning at T025.
 
 ## Session Log
+
+### 2026-06-22 Web CI Dispatch Guidance
+
+- **Completed Action**: Added `workflow_dispatch` to `.github/workflows/web-ci.yml` so the workflow can be run manually from GitHub Actions or `gh workflow run`. Added `docs/github-actions-web-ci.md` explaining automatic PR/push runs, manual UI runs, CLI runs, and what Claude can trigger depending on GitHub authentication.
+- **Verification**: `git diff --check` passed.
+- **Current Blockers**: local npm registry access remains forbidden in this environment.
+- **Next Best Action**: Push this branch and either open/update a PR or run `Web CI` manually from the GitHub Actions tab.
+
+### 2026-06-22 NPM Registry Follow-up and CI
+
+- **Completed Action**: Investigated the npm `403 Forbidden` installation failure, confirmed public package metadata requests are blocked in this environment, added `.github/workflows/web-ci.yml` to run install/typecheck/lint/test/build in GitHub Actions, and documented local/CI npm registry troubleshooting in `docs/npm-registry-troubleshooting.md`.
+- **Verification**: `git diff --check` passed. `npm install` and `npm view react version` still fail with `403 Forbidden`, confirming the blocker is registry/network access rather than a project script failure.
+- **Current Blockers**: local npm registry access remains forbidden in this environment.
+- **Next Best Action**: Push the branch and let GitHub Actions run Web CI, or configure an approved npm registry/mirror locally and run `npm install` followed by the npm verification scripts.
+
+### 2026-06-22 Implement Setup and Foundation
+
+- **Completed Action**: Ran `/speckit.implement` prerequisites, confirmed the active feature has tasks, and completed T007-T024. Added `apps/web/` with Vite/React/TypeScript configuration, Tailwind base styling, app shell and bottom navigation, shared status components, local-first domain types/helpers, Dexie database/schema scaffolding, atomic transaction helper, role guard helpers, SyncOp builder, Supabase client bootstrap, `.env.example`, PWA manifest, and service worker registration. Updated `.gitignore` for Node/Vite outputs and marked T007-T024 complete in `tasks.md`.
+- **Verification**: `git diff --check` passed. `npm install` failed with `403 Forbidden - GET https://registry.npmjs.org/@eslint%2fjs`, so package-lock generation and npm scripts were not run.
+- **Current Blockers**: npm registry access is forbidden in the current environment.
+- **Next Best Action**: Restore package registry access, install dependencies, run the web app verification commands, then continue with T025-T032 for offline item creation.
 
 ### 2026-06-22 Plan and Tasks Refresh
 

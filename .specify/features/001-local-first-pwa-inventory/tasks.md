@@ -13,27 +13,27 @@
 - [x] T004 Create initial task list in `.specify/features/001-local-first-pwa-inventory/tasks.md`
 - [x] T005 Record clarification decisions in `.specify/features/001-local-first-pwa-inventory/specify.md`
 - [x] T006 Update planning artifacts in `.specify/features/001-local-first-pwa-inventory/plan.md`, `.specify/features/001-local-first-pwa-inventory/research.md`, `.specify/features/001-local-first-pwa-inventory/data-model.md`, `.specify/features/001-local-first-pwa-inventory/contracts/`, and `.specify/features/001-local-first-pwa-inventory/quickstart.md`
-- [ ] T007 Scaffold Vite React TypeScript app in `apps/web/`
-- [ ] T008 Add root package scripts delegating to `apps/web/package.json`
-- [ ] T009 Add baseline scripts `dev`, `build`, `preview`, `lint`, `typecheck`, and `test` in `apps/web/package.json`
-- [ ] T010 Add Tailwind CSS and base theme files in `apps/web/tailwind.config.ts` and `apps/web/src/styles/global.css`
-- [ ] T011 Add application route shell in `apps/web/src/app/App.tsx`
-- [ ] T012 Add bottom navigation routes for Home, Locations, Add, Search, Settings, and Item Detail in `apps/web/src/app/routes.tsx`
+- [x] T007 Scaffold Vite React TypeScript app in `apps/web/`
+- [x] T008 Add root package scripts delegating to `apps/web/package.json`
+- [x] T009 Add baseline scripts `dev`, `build`, `preview`, `lint`, `typecheck`, and `test` in `apps/web/package.json`
+- [x] T010 Add Tailwind CSS and base theme files in `apps/web/tailwind.config.ts` and `apps/web/src/styles/global.css`
+- [x] T011 Add application route shell in `apps/web/src/app/App.tsx`
+- [x] T012 Add bottom navigation routes for Home, Locations, Add, Search, Settings, and Item Detail in `apps/web/src/app/routes.tsx`
 
 ## Phase 2: Foundational Architecture
 
-- [ ] T013 Define shared domain types for households, members, items, locations, photos, tags, history, sync ops, conflicts, and settings in `apps/web/src/domain/types.ts`
-- [ ] T014 Add local clock, UUID, normalization, and date retention helpers in `apps/web/src/domain/utils.ts`
-- [ ] T015 Configure Dexie database and schema versioning in `apps/web/src/db/database.ts`
-- [ ] T016 Add IndexedDB stores for `households`, `householdMembers`, `items`, `photos`, `locations`, `tags`, `itemTags`, `history`, `syncOps`, `deviceSync`, `conflicts`, and `settings` in `apps/web/src/db/schema.ts`
-- [ ] T017 Implement atomic local transaction helper that writes domain changes and SyncOps together in `apps/web/src/db/transactions.ts`
-- [ ] T018 Implement current household and role guard utilities in `apps/web/src/services/authorization.ts`
-- [ ] T019 Implement sync operation payload builders in `apps/web/src/sync/syncOpFactory.ts`
-- [ ] T020 Add app-level error and empty-state components in `apps/web/src/components/StatusState.tsx`
-- [ ] T021 Add Supabase client bootstrap without hard-coded secrets in `apps/web/src/services/supabaseClient.ts`
-- [ ] T022 Add environment variable documentation in `apps/web/.env.example`
-- [ ] T023 Add PWA manifest skeleton in `apps/web/public/manifest.webmanifest`
-- [ ] T024 Add service worker registration entry in `apps/web/src/pwa/registerServiceWorker.ts`
+- [x] T013 Define shared domain types for households, members, items, locations, photos, tags, history, sync ops, conflicts, and settings in `apps/web/src/domain/types.ts`
+- [x] T014 Add local clock, UUID, normalization, and date retention helpers in `apps/web/src/domain/utils.ts`
+- [x] T015 Configure Dexie database and schema versioning in `apps/web/src/db/database.ts`
+- [x] T016 Add IndexedDB stores for `households`, `householdMembers`, `items`, `photos`, `locations`, `tags`, `itemTags`, `history`, `syncOps`, `deviceSync`, `conflicts`, and `settings` in `apps/web/src/db/schema.ts`
+- [x] T017 Implement atomic local transaction helper that writes domain changes and SyncOps together in `apps/web/src/db/transactions.ts`
+- [x] T018 Implement current household and role guard utilities in `apps/web/src/services/authorization.ts`
+- [x] T019 Implement sync operation payload builders in `apps/web/src/sync/syncOpFactory.ts`
+- [x] T020 Add app-level error and empty-state components in `apps/web/src/components/StatusState.tsx`
+- [x] T021 Add Supabase client bootstrap without hard-coded secrets in `apps/web/src/services/supabaseClient.ts`
+- [x] T022 Add environment variable documentation in `apps/web/.env.example`
+- [x] T023 Add PWA manifest skeleton in `apps/web/public/manifest.webmanifest`
+- [x] T024 Add service worker registration entry in `apps/web/src/pwa/registerServiceWorker.ts`
 
 ## Phase 3: User Story 1 - Offline item creation with photo
 
