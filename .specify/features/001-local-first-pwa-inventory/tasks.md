@@ -56,12 +56,12 @@
 
 **Independent Test**: Create nested locations offline, add an item to a child location, and browse parent location results including child items.
 
-- [ ] T033 [P] [US2] Implement location repository with cycle prevention in `apps/web/src/db/locationRepository.ts`
-- [ ] T034 [US2] Implement location tree builder and descendant query helpers in `apps/web/src/features/locations/locationTree.ts`
-- [ ] T035 [US2] Implement location tree browser in `apps/web/src/features/locations/LocationsPage.tsx`
-- [ ] T036 [US2] Implement location create/edit form in `apps/web/src/features/locations/LocationForm.tsx`
-- [ ] T037 [US2] Connect item form location selector to location tree in `apps/web/src/features/locations/LocationPicker.tsx`
-- [ ] T038 [US2] Add location tree smoke test in `apps/web/src/test/location-tree.test.ts`
+- [x] T033 [P] [US2] Implement location repository with cycle prevention in `apps/web/src/db/locationRepository.ts`
+- [x] T034 [US2] Implement location tree builder and descendant query helpers in `apps/web/src/features/locations/locationTree.ts`
+- [x] T035 [US2] Implement location tree browser in `apps/web/src/features/locations/LocationsPage.tsx`
+- [x] T036 [US2] Implement location create/edit form in `apps/web/src/features/locations/LocationForm.tsx`
+- [x] T037 [US2] Connect item form location selector to location tree in `apps/web/src/features/locations/LocationPicker.tsx`
+- [x] T038 [US2] Add location tree smoke test in `apps/web/src/test/location-tree.test.ts`
 
 ## Phase 5: User Story 3 - Local search and filters
 
@@ -69,11 +69,11 @@
 
 **Independent Test**: Create multiple local items, disable network, search by keyword and filters, and verify only expected household-scoped items are returned.
 
-- [ ] T039 [P] [US3] Implement normalized text indexing helpers in `apps/web/src/features/search/searchIndex.ts`
-- [ ] T040 [US3] Implement local search query service in `apps/web/src/features/search/searchService.ts`
-- [ ] T041 [US3] Implement search page and filter UI in `apps/web/src/features/search/SearchPage.tsx`
-- [ ] T042 [US3] Add location/tag/category/status/due-date filter integration in `apps/web/src/features/search/SearchFilters.tsx`
-- [ ] T043 [US3] Add offline search smoke test in `apps/web/src/test/offline-search.test.ts`
+- [x] T039 [P] [US3] Implement normalized text indexing helpers in `apps/web/src/features/search/searchIndex.ts`
+- [x] T040 [US3] Implement local search query service in `apps/web/src/features/search/searchService.ts`
+- [x] T041 [US3] Implement search page and filter UI in `apps/web/src/features/search/SearchPage.tsx`
+- [x] T042 [US3] Add location/tag/category/status/due-date filter integration in `apps/web/src/features/search/SearchFilters.tsx`
+- [x] T043 [US3] Add offline search smoke test in `apps/web/src/test/offline-search.test.ts`
 
 ## Phase 6: User Story 4 - Move item and preserve history
 
