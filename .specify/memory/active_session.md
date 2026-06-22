@@ -1,11 +1,27 @@
 # Current Session Progress
 
 - **Current Active Feature**: `001-local-first-pwa-inventory`
-- **Latest Verified Action**: Fixed GitHub Actions typecheck issues for US1 T025-T032 on 2026-06-22; `git diff --check` passed, while npm verification remains blocked by registry/dependency installation failures.
-- **Current Blockers**: Local dependency installation previously failed with npm registry `403 Forbidden`; verify in GitHub Actions or an approved npm registry environment.
-- **Next Best Action**: Run the npm verification suite in GitHub Actions or an approved npm registry environment, then continue with US2 tasks beginning at T033.
+- **Latest Verified Action**: Fixed React hooks lint findings for T033-T043 on 2026-06-22 by removing synchronous state resets from effects and remounting the location form by editing key.
+- **Current Blockers**: Local dependency installation still fails with npm registry `403 Forbidden`, so npm verification remains blocked by missing dependencies in this environment.
+- **Next Best Action**: Re-run Web CI where npm dependencies are available; if it passes, continue with US4 tasks beginning at T044.
 
 ## Session Log
+
+### 2026-06-22 React Hooks Lint Fix for T033-T043
+
+- **Completed Action**: Addressed CI lint errors in `apps/web/src/features/locations/LocationForm.tsx` and `apps/web/src/features/locations/LocationsPage.tsx` without expanding scope beyond T033-T043. Removed the synchronous `setState` reset effect from the form and keyed the form by the active editing location so initial state refreshes by remount. Changed the initial location tree load effect to set state from the async data callback instead of invoking the reload helper that mutates state.
+- **Verification**: `npm run lint` still cannot complete locally because `@eslint/js` is missing after npm registry access failed in this environment; this is distinct from the CI `react-hooks/set-state-in-effect` findings addressed here. `npm run typecheck` and `npm run build` still fail because `vite/client` and `node` type definitions are missing. `npm test` still fails because `vitest` is not installed. `git diff --check` passed.
+- **Current Blockers**: npm registry access remains forbidden locally, preventing dependency installation and full local verification.
+- **Next Best Action**: Re-run Web CI or run `npm install`, `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build` in an approved npm registry environment.
+
+
+### 2026-06-22 US2 Location Tree and US3 Offline Search Tasks T033-T043
+
+- **Completed Action**: Continued `/speckit.implement` for `001-local-first-pwa-inventory` and completed only T033-T043. Added a household-scoped location repository with parent validation and cycle prevention; tree building, descendant collection, browse/create/edit UI, and item-form location picker; local normalized search indexing; local search service and filter UI for text, category, tag, descendant location, status, and due dates; and smoke tests for location tree and offline search. Did not start Supabase, deployment, or T044+ work.
+- **Verification**: `npm install` failed with `403 Forbidden - GET https://registry.npmjs.org/@eslint%2fjs`, leaving dependencies unavailable. `npm run typecheck` and `npm run build` failed because `vite/client` and `node` type definitions are missing. `npm run lint` failed because `@eslint/js` is missing. `npm test` failed because `vitest` is not installed. `git diff --check` passed.
+- **Current Blockers**: npm registry access remains forbidden in this environment, preventing dependency installation and full local verification.
+- **Next Best Action**: Run `npm install`, `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build` in GitHub Actions or an approved npm registry environment, then continue with T044-T048.
+
 
 ### 2026-06-22 GitHub Actions Typecheck Fix for T025-T032
 

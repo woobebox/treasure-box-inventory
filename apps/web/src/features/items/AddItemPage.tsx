@@ -1,4 +1,5 @@
 import { type FormEvent, useState } from 'react';
+import { LocationPicker } from '../locations/LocationPicker';
 import { TagPicker } from '../tags/TagPicker';
 import { createItem } from './createItem';
 import { useItemForm } from './useItemForm';
@@ -52,8 +53,7 @@ export function AddItemPage() {
         {errors.category && <p className="mt-1 text-xs text-red-600">{errors.category}</p>}
       </div>
       <div>
-        <label className="text-sm font-medium text-slate-700" htmlFor="item-location">Location ID</label>
-        <input id="item-location" value={state.locationId} onChange={(event) => setState({ ...state, locationId: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2" placeholder="location-id" />
+        <LocationPicker householdId={demoHouseholdId} value={state.locationId} onChange={(locationId) => setState({ ...state, locationId })} />
         {errors.locationId && <p className="mt-1 text-xs text-red-600">{errors.locationId}</p>}
       </div>
       <div>

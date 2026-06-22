@@ -1,4 +1,6 @@
 import { AddItemPage } from '../features/items/AddItemPage';
+import { LocationsPage } from '../features/locations/LocationsPage';
+import { SearchPage } from '../features/search/SearchPage';
 import { bottomNavRoutes } from './routes';
 
 const pageCopy: Record<string, { title: string; description: string }> = {
@@ -24,6 +26,10 @@ export function App() {
         <section className="rounded-3xl border border-teal-100 bg-white p-5 shadow-sm">
           {path === '/add' ? (
             <AddItemPage />
+          ) : path === '/locations' ? (
+            <LocationsPage />
+          ) : path === '/search' ? (
+            <SearchPage />
           ) : (
             <>
               <h2 className="font-semibold text-slate-900">Implementation shell</h2>
