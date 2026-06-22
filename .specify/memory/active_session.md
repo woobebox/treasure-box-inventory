@@ -141,3 +141,10 @@
 - **Verification**: `npm run typecheck` now proceeds past the reported `move-history.test.ts` errors locally, but still cannot complete because this environment lacks installed `vite/client` and `node` type definitions. `npm install` was retried and still fails with npm registry `403 Forbidden` for `@eslint/js`. `git diff --check` passed.
 - **Current Blockers**: local npm registry access remains forbidden, preventing dependency restoration and complete local typecheck.
 - **Next Best Action**: Re-run Web CI where dependencies are available to confirm `npm run typecheck` passes end-to-end.
+
+### 2026-06-22 Item Detail Lint Follow-up
+
+- **Completed Action**: Fixed the CI `react-hooks/set-state-in-effect` lint finding in `ItemDetailPage.tsx` by moving item detail loading into an async helper and updating React state from promise callbacks rather than calling the reload state updater directly from the effect body. Also removed the missing `reload` dependency warning by keeping the effect dependency to the primitive `itemId` input.
+- **Verification**: `npm run lint` still cannot complete locally because `@eslint/js` is not installed in this environment. `npm run typecheck` still fails locally before project checks because `vite/client` and `node` type definitions are unavailable. `git diff --check` passed.
+- **Current Blockers**: local npm dependencies remain unavailable due to npm registry `403 Forbidden` for `@eslint/js`.
+- **Next Best Action**: Re-run Web CI where dependencies are available to confirm lint passes end-to-end.
