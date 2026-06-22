@@ -1,11 +1,18 @@
 # Current Session Progress
 
 - **Current Active Feature**: `001-local-first-pwa-inventory`
-- **Latest Verified Action**: Merged `origin/codex/-deep-research-report.md` into local `main` on 2026-06-22, bringing in `apps/web`, Web CI, and Spec Kit planning artifacts; `git diff --check` passed after resolving the session-log conflict.
+- **Latest Verified Action**: Completed US1 offline item creation tasks T025-T032 on 2026-06-22; `git diff --check` passed, while npm verification remains blocked by registry/dependency installation failures.
 - **Current Blockers**: Local dependency installation previously failed with npm registry `403 Forbidden`; verify in GitHub Actions or an approved npm registry environment.
-- **Next Best Action**: Push merged `main` to `origin/main`, then rerun `Web CI` from GitHub Actions and continue with US1 tasks beginning at T025 if CI passes.
+- **Next Best Action**: Run the npm verification suite in GitHub Actions or an approved npm registry environment, then continue with US2 tasks beginning at T033.
 
 ## Session Log
+
+### 2026-06-22 US1 Offline Item Creation Tasks T025-T032
+
+- **Completed Action**: Continued `/speckit.implement` for `001-local-first-pwa-inventory` and completed only T025-T032. Added household-scoped item, tag, and compressed-photo metadata repositories; add-item form validation and screen; tag picker; atomic IndexedDB create transaction writing item, photo metadata, item tags, history, and pending SyncOp together; and an offline creation smoke test. Did not modify later incomplete tasks.
+- **Verification**: `npm install` failed with `403 Forbidden - GET https://registry.npmjs.org/@eslint%2fjs`, leaving dependencies unavailable. `npm run typecheck` and `npm run build` failed because `vite/client` and `node` type definitions are missing. `npm run lint` failed because `@eslint/js` is missing. `npm test` failed because `vitest` is not installed. `git diff --check` passed.
+- **Current Blockers**: npm registry access remains forbidden in this environment, preventing dependency installation and full local verification.
+- **Next Best Action**: Run `npm install`, `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build` in GitHub Actions or an approved npm registry environment, then continue with T033-T038.
 
 ### 2026-06-22 Merge App Development Branch Into Main
 

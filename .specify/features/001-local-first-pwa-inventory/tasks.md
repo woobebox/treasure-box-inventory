@@ -41,14 +41,14 @@
 
 **Independent Test**: Disable network, create a photo item, reload the app, and verify the item, compressed photo, thumbnail, metadata, history, and pending SyncOp remain in IndexedDB.
 
-- [ ] T025 [P] [US1] Implement item repository create/read/update helpers in `apps/web/src/db/itemRepository.ts`
-- [ ] T026 [P] [US1] Implement tag repository helpers in `apps/web/src/db/tagRepository.ts`
-- [ ] T027 [P] [US1] Implement photo metadata repository helpers in `apps/web/src/db/photoRepository.ts`
-- [ ] T028 [US1] Implement add item form state and validation in `apps/web/src/features/items/useItemForm.ts`
-- [ ] T029 [US1] Implement add item screen in `apps/web/src/features/items/AddItemPage.tsx`
-- [ ] T030 [US1] Implement tag picker component in `apps/web/src/features/tags/TagPicker.tsx`
-- [ ] T031 [US1] Wire item create transaction with photo metadata, tags, history, and SyncOp in `apps/web/src/features/items/createItem.ts`
-- [ ] T032 [US1] Add offline creation smoke test in `apps/web/src/test/offline-create-item.test.ts`
+- [x] T025 [P] [US1] Implement item repository create/read/update helpers in `apps/web/src/db/itemRepository.ts`
+- [x] T026 [P] [US1] Implement tag repository helpers in `apps/web/src/db/tagRepository.ts`
+- [x] T027 [P] [US1] Implement photo metadata repository helpers in `apps/web/src/db/photoRepository.ts`
+- [x] T028 [US1] Implement add item form state and validation in `apps/web/src/features/items/useItemForm.ts`
+- [x] T029 [US1] Implement add item screen in `apps/web/src/features/items/AddItemPage.tsx`
+- [x] T030 [US1] Implement tag picker component in `apps/web/src/features/tags/TagPicker.tsx`
+- [x] T031 [US1] Wire item create transaction with photo metadata, tags, history, and SyncOp in `apps/web/src/features/items/createItem.ts`
+- [x] T032 [US1] Add offline creation smoke test in `apps/web/src/test/offline-create-item.test.ts`
 
 ## Phase 4: User Story 2 - Household location tree
 
