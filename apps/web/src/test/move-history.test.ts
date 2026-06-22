@@ -12,11 +12,11 @@ describe('offline item move history', () => {
     const shelf = await createLocation({ householdId: 'household-1', name: 'Shelf', type: 'room' });
     const box = await createLocation({ householdId: 'household-1', name: 'Box', type: 'box' });
     const created = await createItem({ householdId: 'household-1', createdBy: 'user-1', updatedBy: 'user-1', deviceId: 'device-1', name: 'Passport', category: 'Documents', currentLocationId: shelf.id, tagNames: ['important'] });
-    const result = await moveItem({ householdId: 'household-1', itemId: created.item.id, toLocationId: box.id, actorId: 'user-1', deviceId: 'device-1' });
+    const result = await moveItem({ householdId: 'household-1', itemId: created.itemId, toLocationId: box.id, actorId: 'user-1', deviceId: 'device-1' });
     expect(result.item.currentLocationId).toBe(box.id);
-    const history = await listItemHistory('household-1', created.item.id);
+    const history = await listItemHistory('household-1', created.itemId);
     expect(history.some((entry) => entry.action === HISTORY_ACTIONS.ITEM_MOVED && entry.fromLocationId === shelf.id && entry.toLocationId === box.id)).toBe(true);
-    const pending = await db.syncOps.where('entityId').equals(created.item.id).filter((op) => op.status === 'pending' && op.opType === 'update').toArray();
+    const pending = await db.syncOps.where('entityId').equals(created.itemId).filter((op) => op.status === 'pending' && op.opType === 'update').toArray();
     expect(pending).toHaveLength(1);
   });
 });

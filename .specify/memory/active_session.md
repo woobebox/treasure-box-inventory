@@ -134,3 +134,10 @@
 - **Verification**: `npm run typecheck` still fails locally because `vite/client` and `node` type definitions are missing after dependency installation remained unavailable in this environment. `npm test` still fails because `vitest` is not installed. `npm run lint` still fails because `@eslint/js` is missing. `npm run build` still fails at the same missing type definitions. `git diff --check` passed.
 - **Current Blockers**: npm dependencies remain unavailable locally due to the previously observed npm registry `403 Forbidden` issue, preventing full local verification.
 - **Next Best Action**: Re-run Web CI or run `npm install`, `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build` in an environment with approved npm registry access, then continue with Phase 8 tasks beginning at T055.
+
+### 2026-06-22 Move History Typecheck Follow-up
+
+- **Completed Action**: Fixed the Phase 6 move-history smoke test type error reported by CI by using `CreateItemResult.itemId` instead of a non-existent `CreateItemResult.item.id` property.
+- **Verification**: `npm run typecheck` now proceeds past the reported `move-history.test.ts` errors locally, but still cannot complete because this environment lacks installed `vite/client` and `node` type definitions. `npm install` was retried and still fails with npm registry `403 Forbidden` for `@eslint/js`. `git diff --check` passed.
+- **Current Blockers**: local npm registry access remains forbidden, preventing dependency restoration and complete local typecheck.
+- **Next Best Action**: Re-run Web CI where dependencies are available to confirm `npm run typecheck` passes end-to-end.
