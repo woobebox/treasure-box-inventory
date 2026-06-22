@@ -12,7 +12,6 @@ export function LocationForm({ householdId, editing, onSaved }: Props) {
   const [parentId, setParentId] = useState(editing?.parentId ?? '');
   const [message, setMessage] = useState('');
   useEffect(() => { void listLocationsByHousehold(householdId).then(setLocations); }, [householdId]);
-  useEffect(() => { setName(editing?.name ?? ''); setType(editing?.type ?? 'room'); setParentId(editing?.parentId ?? ''); }, [editing]);
   async function submit(event: FormEvent) {
     event.preventDefault();
     try {

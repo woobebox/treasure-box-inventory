@@ -10,6 +10,8 @@ function Node({ node, onEdit }: { node: LocationTreeNode; onEdit: (location: Loc
 export function LocationsPage() {
   const [tree, setTree] = useState<LocationTreeNode[]>([]); const [editing, setEditing] = useState<Location | null>(null);
   async function reload() { const [locations, items] = await Promise.all([listLocationsByHousehold(demoHouseholdId), listItemsByHousehold(demoHouseholdId)]); setTree(buildLocationTree(locations, items)); }
-  useEffect(() => { void reload(); }, []);
-  return <div className="space-y-5"><LocationForm householdId={demoHouseholdId} editing={editing} onSaved={() => { setEditing(null); void reload(); }} /><ul>{tree.map((node) => <Node key={node.location.id} node={node} onEdit={setEditing} />)}</ul></div>;
+  useEffect(() => {
+    void Promise.all([listLocationsByHousehold(demoHouseholdId), listItemsByHousehold(demoHouseholdId)]).then(([locations, items]) => setTree(buildLocationTree(locations, items)));
+  }, []);
+  return <div className="space-y-5"><LocationForm key={editing?.id ?? 'new-location'} householdId={demoHouseholdId} editing={editing} onSaved={() => { setEditing(null); void reload(); }} /><ul>{tree.map((node) => <Node key={node.location.id} node={node} onEdit={setEditing} />)}</ul></div>;
 }
