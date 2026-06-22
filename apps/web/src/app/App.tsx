@@ -1,4 +1,7 @@
 import { AddItemPage } from '../features/items/AddItemPage';
+import { ItemDetailPage } from '../features/items/ItemDetailPage';
+import { HomePage } from '../features/home/HomePage';
+import { StorageSettings } from '../features/settings/StorageSettings';
 import { LocationsPage } from '../features/locations/LocationsPage';
 import { SearchPage } from '../features/search/SearchPage';
 import { bottomNavRoutes } from './routes';
@@ -24,12 +27,18 @@ export function App() {
       </header>
       <main className="flex-1 px-4 py-6">
         <section className="rounded-3xl border border-teal-100 bg-white p-5 shadow-sm">
-          {path === '/add' ? (
+          {path === '/' ? (
+            <HomePage />
+          ) : path === '/add' ? (
             <AddItemPage />
           ) : path === '/locations' ? (
             <LocationsPage />
           ) : path === '/search' ? (
             <SearchPage />
+          ) : path === '/settings' ? (
+            <StorageSettings />
+          ) : path.startsWith('/items/') ? (
+            <ItemDetailPage itemId={decodeURIComponent(path.split('/').pop() ?? '')} />
           ) : (
             <>
               <h2 className="font-semibold text-slate-900">Implementation shell</h2>

@@ -81,11 +81,11 @@
 
 **Independent Test**: Move an item offline, verify current location changes, history records source and destination, and a pending SyncOp is created.
 
-- [ ] T044 [P] [US4] Implement history repository and action constants in `apps/web/src/db/historyRepository.ts`
-- [ ] T045 [US4] Implement item move transaction in `apps/web/src/features/items/moveItem.ts`
-- [ ] T046 [US4] Implement item detail screen with current location and history timeline in `apps/web/src/features/items/ItemDetailPage.tsx`
-- [ ] T047 [US4] Implement move item UI flow in `apps/web/src/features/items/MoveItemDialog.tsx`
-- [ ] T048 [US4] Add move history smoke test in `apps/web/src/test/move-history.test.ts`
+- [x] T044 [P] [US4] Implement history repository and action constants in `apps/web/src/db/historyRepository.ts`
+- [x] T045 [US4] Implement item move transaction in `apps/web/src/features/items/moveItem.ts`
+- [x] T046 [US4] Implement item detail screen with current location and history timeline in `apps/web/src/features/items/ItemDetailPage.tsx`
+- [x] T047 [US4] Implement move item UI flow in `apps/web/src/features/items/MoveItemDialog.tsx`
+- [x] T048 [US4] Add move history smoke test in `apps/web/src/test/move-history.test.ts`
 
 ## Phase 7: User Story 5 - Offline PWA persistence and installability
 
@@ -93,12 +93,12 @@
 
 **Independent Test**: Load once online, disable network, reload app shell, browse existing local items, and confirm service worker fallback works.
 
-- [ ] T049 [P] [US5] Configure Workbox precache and runtime cache in `apps/web/src/pwa/workbox.ts`
-- [ ] T050 [US5] Implement offline fallback page in `apps/web/public/offline.html`
-- [ ] T051 [US5] Add app shell cache registration in `apps/web/src/main.tsx`
-- [ ] T052 [US5] Implement home dashboard with recent items, reminders, sync count, and current household in `apps/web/src/features/home/HomePage.tsx`
-- [ ] T053 [US5] Implement storage estimate and persistent storage request in `apps/web/src/features/settings/StorageSettings.tsx`
-- [ ] T054 [US5] Add PWA offline smoke test in `apps/web/src/test/pwa-offline.test.ts`
+- [x] T049 [P] [US5] Configure Workbox precache and runtime cache in `apps/web/src/pwa/workbox.ts`
+- [x] T050 [US5] Implement offline fallback page in `apps/web/public/offline.html`
+- [x] T051 [US5] Add app shell cache registration in `apps/web/src/main.tsx`
+- [x] T052 [US5] Implement home dashboard with recent items, reminders, sync count, and current household in `apps/web/src/features/home/HomePage.tsx`
+- [x] T053 [US5] Implement storage estimate and persistent storage request in `apps/web/src/features/settings/StorageSettings.tsx`
+- [x] T054 [US5] Add PWA offline smoke test in `apps/web/src/test/pwa-offline.test.ts`
 
 ## Phase 8: User Story 6 - Supabase sync after network restore
 

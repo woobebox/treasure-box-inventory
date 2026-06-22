@@ -127,3 +127,10 @@
 - **Verification**: `git diff --check` passed.
 - **Current Blockers**: none.
 - **Next Best Action**: define the first active feature under `.specify/features/` and create tasks before coding.
+
+### 2026-06-22 US4 Move History and US5 Offline PWA Tasks T044-T054
+
+- **Completed Action**: Continued `/speckit.implement` with the user-requested scope limited to Phase 6 and Phase 7. Completed T044-T054 by adding a household-scoped history repository and move action constants; an atomic item move transaction that updates the current location, writes source/destination history, and queues a pending SyncOp; item detail and move UI; PWA app shell cache configuration and offline fallback; home dashboard; storage estimate/persistence settings; and smoke tests for move history and PWA offline configuration. Did not start Phase 8 or later tasks.
+- **Verification**: `npm run typecheck` still fails locally because `vite/client` and `node` type definitions are missing after dependency installation remained unavailable in this environment. `npm test` still fails because `vitest` is not installed. `npm run lint` still fails because `@eslint/js` is missing. `npm run build` still fails at the same missing type definitions. `git diff --check` passed.
+- **Current Blockers**: npm dependencies remain unavailable locally due to the previously observed npm registry `403 Forbidden` issue, preventing full local verification.
+- **Next Best Action**: Re-run Web CI or run `npm install`, `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build` in an environment with approved npm registry access, then continue with Phase 8 tasks beginning at T055.
