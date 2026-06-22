@@ -127,3 +127,31 @@
 - **Verification**: `git diff --check` passed.
 - **Current Blockers**: none.
 - **Next Best Action**: define the first active feature under `.specify/features/` and create tasks before coding.
+
+### 2026-06-22 US4 Move History and US5 Offline PWA Tasks T044-T054
+
+- **Completed Action**: Continued `/speckit.implement` with the user-requested scope limited to Phase 6 and Phase 7. Completed T044-T054 by adding a household-scoped history repository and move action constants; an atomic item move transaction that updates the current location, writes source/destination history, and queues a pending SyncOp; item detail and move UI; PWA app shell cache configuration and offline fallback; home dashboard; storage estimate/persistence settings; and smoke tests for move history and PWA offline configuration. Did not start Phase 8 or later tasks.
+- **Verification**: `npm run typecheck` still fails locally because `vite/client` and `node` type definitions are missing after dependency installation remained unavailable in this environment. `npm test` still fails because `vitest` is not installed. `npm run lint` still fails because `@eslint/js` is missing. `npm run build` still fails at the same missing type definitions. `git diff --check` passed.
+- **Current Blockers**: npm dependencies remain unavailable locally due to the previously observed npm registry `403 Forbidden` issue, preventing full local verification.
+- **Next Best Action**: Re-run Web CI or run `npm install`, `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build` in an environment with approved npm registry access, then continue with Phase 8 tasks beginning at T055.
+
+### 2026-06-22 Move History Typecheck Follow-up
+
+- **Completed Action**: Fixed the Phase 6 move-history smoke test type error reported by CI by using `CreateItemResult.itemId` instead of a non-existent `CreateItemResult.item.id` property.
+- **Verification**: `npm run typecheck` now proceeds past the reported `move-history.test.ts` errors locally, but still cannot complete because this environment lacks installed `vite/client` and `node` type definitions. `npm install` was retried and still fails with npm registry `403 Forbidden` for `@eslint/js`. `git diff --check` passed.
+- **Current Blockers**: local npm registry access remains forbidden, preventing dependency restoration and complete local typecheck.
+- **Next Best Action**: Re-run Web CI where dependencies are available to confirm `npm run typecheck` passes end-to-end.
+
+### 2026-06-22 Item Detail Lint Follow-up
+
+- **Completed Action**: Fixed the CI `react-hooks/set-state-in-effect` lint finding in `ItemDetailPage.tsx` by moving item detail loading into an async helper and updating React state from promise callbacks rather than calling the reload state updater directly from the effect body. Also removed the missing `reload` dependency warning by keeping the effect dependency to the primitive `itemId` input.
+- **Verification**: `npm run lint` still cannot complete locally because `@eslint/js` is not installed in this environment. `npm run typecheck` still fails locally before project checks because `vite/client` and `node` type definitions are unavailable. `git diff --check` passed.
+- **Current Blockers**: local npm dependencies remain unavailable due to npm registry `403 Forbidden` for `@eslint/js`.
+- **Next Best Action**: Re-run Web CI where dependencies are available to confirm lint passes end-to-end.
+
+### 2026-06-22 App Test IndexedDB Follow-up
+
+- **Completed Action**: Fixed the app shell test failure caused by `HomePage` opening Dexie during render without an IndexedDB polyfill by loading `fake-indexeddb/auto` from the shared Vitest setup file.
+- **Verification**: `npm run test` still cannot complete locally because `vitest` is not installed in this environment. `git diff --check` passed.
+- **Current Blockers**: local npm dependencies remain unavailable due to npm registry access restrictions.
+- **Next Best Action**: Re-run Web CI where dependencies are available to confirm the full Vitest suite passes.
