@@ -1,11 +1,18 @@
 # Current Session Progress
 
 - **Current Active Feature**: `001-local-first-pwa-inventory`
-- **Latest Verified Action**: Completed US1 offline item creation tasks T025-T032 on 2026-06-22; `git diff --check` passed, while npm verification remains blocked by registry/dependency installation failures.
+- **Latest Verified Action**: Fixed GitHub Actions typecheck issues for US1 T025-T032 on 2026-06-22; `git diff --check` passed, while npm verification remains blocked by registry/dependency installation failures.
 - **Current Blockers**: Local dependency installation previously failed with npm registry `403 Forbidden`; verify in GitHub Actions or an approved npm registry environment.
 - **Next Best Action**: Run the npm verification suite in GitHub Actions or an approved npm registry environment, then continue with US2 tasks beginning at T033.
 
 ## Session Log
+
+### 2026-06-22 GitHub Actions Typecheck Fix for T025-T032
+
+- **Completed Action**: Fixed the GitHub Actions typecheck issues reported for commit `609c696`/US1 T025-T032 without expanding T033+ scope. Updated `apps/web/src/db/database.ts` to type composite-key Dexie stores (`itemTags`, `deviceSync`, `settings`) as `Table<..., [string, string]>` instead of using Dexie schema strings as `EntityTable` key names. Updated `apps/web/src/features/items/createItem.ts` to pass transaction tables as an array so item, photo metadata, tags, itemTags, history, and SyncOp remain in one atomic Dexie transaction. Updated `apps/web/vite.config.ts` to import `defineConfig` from `vitest/config` for typed Vitest `test` configuration.
+- **Verification**: `npm install` still failed with `403 Forbidden - GET https://registry.npmjs.org/@eslint%2fjs`, leaving dependencies unavailable. Because install is blocked, `npm run typecheck` and `npm run build` still fail locally on missing `vite/client` and `node` type definitions, `npm run lint` fails on missing `@eslint/js`, and `npm test` fails because `vitest` is not installed. `git diff --check` passed.
+- **Current Blockers**: npm registry access remains forbidden in this environment, so the GitHub Actions-only TypeScript fixes cannot be fully revalidated locally. `git push origin HEAD:codex/implement-features-t025-t032-for-pwa-inventory` was attempted but failed with `CONNECT tunnel failed, response 403`.
+- **Next Best Action**: Push the current `HEAD` commit from a network environment with GitHub access and let Web CI rerun where npm dependencies can be installed.
 
 ### 2026-06-22 US1 Offline Item Creation Tasks T025-T032
 

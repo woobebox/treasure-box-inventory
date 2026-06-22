@@ -29,7 +29,7 @@ export async function createItem(input: CreateItemInput): Promise<CreateItemResu
   };
   const syncOp = buildSyncOp({ householdId: input.householdId, actorId: input.createdBy, deviceId: input.deviceId, opType: 'create', entityType: 'item', entityId: itemId, baseVersion: null, payload: { item, photo, tagNames: input.tagNames, history } });
 
-  return db.transaction('rw', db.items, db.photos, db.tags, db.itemTags, db.history, db.syncOps, async () => {
+  return db.transaction('rw', [db.items, db.photos, db.tags, db.itemTags, db.history, db.syncOps], async () => {
     await db.items.put(item);
     if (photo) await db.photos.put(photo);
     const tags = [] as Tag[];
