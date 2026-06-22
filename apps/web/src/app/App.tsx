@@ -1,3 +1,4 @@
+import { AddItemPage } from '../features/items/AddItemPage';
 import { bottomNavRoutes } from './routes';
 
 const pageCopy: Record<string, { title: string; description: string }> = {
@@ -21,8 +22,14 @@ export function App() {
       </header>
       <main className="flex-1 px-4 py-6">
         <section className="rounded-3xl border border-teal-100 bg-white p-5 shadow-sm">
-          <h2 className="font-semibold text-slate-900">Implementation shell</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-600">Core routes are ready for the local IndexedDB, media, sync, and household features defined in the Spec Kit task plan.</p>
+          {path === '/add' ? (
+            <AddItemPage />
+          ) : (
+            <>
+              <h2 className="font-semibold text-slate-900">Implementation shell</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">Core routes are ready for the local IndexedDB, media, sync, and household features defined in the Spec Kit task plan.</p>
+            </>
+          )}
         </section>
       </main>
       <nav className="grid grid-cols-5 border-t border-slate-200 bg-white px-2 pb-3 pt-2">

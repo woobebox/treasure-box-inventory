@@ -1,11 +1,25 @@
 # Current Session Progress
 
 - **Current Active Feature**: `001-local-first-pwa-inventory`
-- **Latest Verified Action**: Merged `origin/codex/-deep-research-report.md` into local `main` on 2026-06-22, bringing in `apps/web`, Web CI, and Spec Kit planning artifacts; `git diff --check` passed after resolving the session-log conflict.
+- **Latest Verified Action**: Fixed GitHub Actions typecheck issues for US1 T025-T032 on 2026-06-22; `git diff --check` passed, while npm verification remains blocked by registry/dependency installation failures.
 - **Current Blockers**: Local dependency installation previously failed with npm registry `403 Forbidden`; verify in GitHub Actions or an approved npm registry environment.
-- **Next Best Action**: Push merged `main` to `origin/main`, then rerun `Web CI` from GitHub Actions and continue with US1 tasks beginning at T025 if CI passes.
+- **Next Best Action**: Run the npm verification suite in GitHub Actions or an approved npm registry environment, then continue with US2 tasks beginning at T033.
 
 ## Session Log
+
+### 2026-06-22 GitHub Actions Typecheck Fix for T025-T032
+
+- **Completed Action**: Fixed the GitHub Actions typecheck issues reported for commit `609c696`/US1 T025-T032 without expanding T033+ scope. Updated `apps/web/src/db/database.ts` to type composite-key Dexie stores (`itemTags`, `deviceSync`, `settings`) as `Table<..., [string, string]>` instead of using Dexie schema strings as `EntityTable` key names. Updated `apps/web/src/features/items/createItem.ts` to pass transaction tables as an array so item, photo metadata, tags, itemTags, history, and SyncOp remain in one atomic Dexie transaction. Updated `apps/web/vite.config.ts` to import `defineConfig` from `vitest/config` for typed Vitest `test` configuration.
+- **Verification**: `npm install` still failed with `403 Forbidden - GET https://registry.npmjs.org/@eslint%2fjs`, leaving dependencies unavailable. Because install is blocked, `npm run typecheck` and `npm run build` still fail locally on missing `vite/client` and `node` type definitions, `npm run lint` fails on missing `@eslint/js`, and `npm test` fails because `vitest` is not installed. `git diff --check` passed.
+- **Current Blockers**: npm registry access remains forbidden in this environment, so the GitHub Actions-only TypeScript fixes cannot be fully revalidated locally. `git push origin HEAD:codex/implement-features-t025-t032-for-pwa-inventory` was attempted but failed with `CONNECT tunnel failed, response 403`.
+- **Next Best Action**: Push the current `HEAD` commit from a network environment with GitHub access and let Web CI rerun where npm dependencies can be installed.
+
+### 2026-06-22 US1 Offline Item Creation Tasks T025-T032
+
+- **Completed Action**: Continued `/speckit.implement` for `001-local-first-pwa-inventory` and completed only T025-T032. Added household-scoped item, tag, and compressed-photo metadata repositories; add-item form validation and screen; tag picker; atomic IndexedDB create transaction writing item, photo metadata, item tags, history, and pending SyncOp together; and an offline creation smoke test. Did not modify later incomplete tasks.
+- **Verification**: `npm install` failed with `403 Forbidden - GET https://registry.npmjs.org/@eslint%2fjs`, leaving dependencies unavailable. `npm run typecheck` and `npm run build` failed because `vite/client` and `node` type definitions are missing. `npm run lint` failed because `@eslint/js` is missing. `npm test` failed because `vitest` is not installed. `git diff --check` passed.
+- **Current Blockers**: npm registry access remains forbidden in this environment, preventing dependency installation and full local verification.
+- **Next Best Action**: Run `npm install`, `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build` in GitHub Actions or an approved npm registry environment, then continue with T033-T038.
 
 ### 2026-06-22 Merge App Development Branch Into Main
 

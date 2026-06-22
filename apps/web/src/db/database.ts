@@ -1,4 +1,4 @@
-import Dexie, { type EntityTable } from 'dexie';
+import Dexie, { type EntityTable, type Table } from 'dexie';
 import type { AppSetting, ConflictRecord, DeviceSync, HistoryEntry, Household, HouseholdMember, Item, ItemTag, Location, Photo, SyncOp, Tag } from '../domain/types';
 import { schemaV1 } from './schema';
 
@@ -9,12 +9,12 @@ export class InventoryDatabase extends Dexie {
   photos!: EntityTable<Photo, 'id'>;
   locations!: EntityTable<Location, 'id'>;
   tags!: EntityTable<Tag, 'id'>;
-  itemTags!: EntityTable<ItemTag, '[itemId+tagId]'>;
+  itemTags!: Table<ItemTag, [string, string]>;
   history!: EntityTable<HistoryEntry, 'id'>;
   syncOps!: EntityTable<SyncOp, 'id'>;
-  deviceSync!: EntityTable<DeviceSync, '[householdId+deviceId]'>;
+  deviceSync!: Table<DeviceSync, [string, string]>;
   conflicts!: EntityTable<ConflictRecord, 'id'>;
-  settings!: EntityTable<AppSetting, '[householdId+key]'>;
+  settings!: Table<AppSetting, [string, string]>;
 
   constructor() {
     super('treasure-box-inventory');
