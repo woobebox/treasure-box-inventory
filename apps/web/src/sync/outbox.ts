@@ -16,7 +16,7 @@ export async function pushOutbox(householdId: string, deviceId: string): Promise
   const timestamp = nowIso();
   const ackIds = new Set((data?.acks ?? []).map((ack: { op_id: string }) => ack.op_id));
   const conflictIds = new Set((data?.conflicts ?? []).map((conflict: { op_id: string }) => conflict.op_id));
-  await db.transaction('rw', db.syncOps, db.deviceSync, async () => {
+  await db.transaction('rw', [db.syncOps, db.deviceSync], async () => {
     for (const op of ops) await db.syncOps.update(op.id, ackIds.has(op.id) ? { status: 'synced', syncedAt: timestamp, updatedAt: timestamp } : conflictIds.has(op.id) ? { status: 'conflicted', lastError: 'Server conflict', updatedAt: timestamp } : { status: 'pending', updatedAt: timestamp });
     if (data?.cursor) await db.deviceSync.put({ householdId, deviceId, pullCursor: data.cursor, lastPulledAt: timestamp });
   });

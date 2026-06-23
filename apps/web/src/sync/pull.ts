@@ -11,7 +11,7 @@ export async function pullChanges(householdId: string, deviceId: string): Promis
   const { data, error } = await supabase.functions.invoke(`sync/changes?household_id=${encodeURIComponent(householdId)}&device_id=${encodeURIComponent(deviceId)}&cursor=${encodeURIComponent(sync?.pullCursor ?? '')}`, { method: 'GET' });
   if (error) throw new Error(error.message);
   let applied = 0;
-  await db.transaction('rw', db.items, db.locations, db.photos, db.tags, db.history, db.deviceSync, db.conflicts, async () => {
+  await db.transaction('rw', [db.items, db.locations, db.photos, db.tags, db.history, db.deviceSync, db.conflicts], async () => {
     for (const change of (data?.changes ?? []) as RemoteChange[]) {
       const table = tableMap[change.entity_type as keyof typeof tableMap]; if (!table) continue;
       const local = await table.get(change.entity_id) as { version?: number } | undefined;

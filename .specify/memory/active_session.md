@@ -1,11 +1,19 @@
 # Current Session Progress
 
 - **Current Active Feature**: `001-local-first-pwa-inventory`
-- **Latest Verified Action**: Completed `/speckit.implement` scope limited to Phase 8 and Phase 9 on 2026-06-22, covering Supabase sync migrations/functions/client UI and household membership least-privilege flows.
-- **Current Blockers**: Local dependency installation still fails with npm registry `403 Forbidden`, so npm verification remains blocked by missing dependencies in this environment.
-- **Next Best Action**: Re-run Web CI where npm dependencies are available; if it passes, continue with Phase 10 tasks beginning at T074.
+- **Latest Verified Action**: Fixed the Phase 8/9 TypeScript regression on 2026-06-23 by passing Dexie transaction tables as arrays and revalidating typecheck, lint, tests, build, and whitespace checks.
+- **Current Blockers**: none for the Phase 8/9 typecheck follow-up.
+- **Next Best Action**: Continue with Phase 10 tasks beginning at T074 when requested.
 
 ## Session Log
+
+### 2026-06-23 Phase 8/9 Typecheck Follow-up
+
+- **Completed Action**: Fixed the `src/sync/pull.ts(14,101): error TS2554` CI failure by switching Dexie multi-table transactions in `pullChanges`, `pushOutbox`, and household creation to the array table overload. Split `useAuth` into `authContext.ts` and initialized auth loading from Supabase configuration to avoid React hooks lint findings while keeping `AuthProvider` component-only for Fast Refresh.
+- **Verification**: `npm run typecheck`, `npm test`, `npm run lint`, `npm run build`, and `git diff --check` all passed locally.
+- **Current Blockers**: none.
+- **Next Best Action**: Continue with Phase 10 tasks beginning at T074 when requested.
+
 
 ### 2026-06-22 Phase 8 Supabase Sync and Phase 9 Household Authorization
 

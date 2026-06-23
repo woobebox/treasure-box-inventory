@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Household, HouseholdMember } from '../../domain/types';
 import { createHousehold, getActiveMember, listHouseholdsForUser, listMembers } from '../../db/householdRepository';
-import { useAuth } from '../../services/auth';
+import { useAuth } from '../../services/authContext';
 import { MemberManagement } from './MemberManagement';
 
 export function HouseholdSettingsPage() {
