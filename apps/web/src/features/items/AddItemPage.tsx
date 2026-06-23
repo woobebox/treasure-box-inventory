@@ -1,6 +1,7 @@
 import { type FormEvent, useState } from 'react';
 import { LocationPicker } from '../locations/LocationPicker';
 import { TagPicker } from '../tags/TagPicker';
+import { PhotoInput } from './PhotoInput';
 import { createItem } from './createItem';
 import { useItemForm } from './useItemForm';
 
@@ -29,10 +30,11 @@ export function AddItemPage() {
         currentLocationId: state.locationId,
         notes: state.notes,
         dueAt: state.dueAt || null,
-        tagNames: state.tagNames
+        tagNames: state.tagNames,
+        photo: state.photo?.metadata
       });
       setMessage(`已離線儲存物品，待同步作業 ${result.syncOp.id.slice(0, 8)} 已建立。`);
-      setState({ name: '', category: '', locationId: '', notes: '', dueAt: '', tagNames: [] });
+      setState({ name: '', category: '', locationId: '', notes: '', dueAt: '', tagNames: [], photo: undefined });
     } catch (error) {
       setMessage(error instanceof Error ? error.message : '儲存失敗');
     } finally {
@@ -64,6 +66,7 @@ export function AddItemPage() {
         <label className="text-sm font-medium text-slate-700" htmlFor="item-due">Due date</label>
         <input id="item-due" type="date" value={state.dueAt} onChange={(event) => setState({ ...state, dueAt: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2" />
       </div>
+      <PhotoInput value={state.photo} onChange={(photo) => setState({ ...state, photo })} />
       <TagPicker selected={state.tagNames} onChange={(tagNames) => setState({ ...state, tagNames })} />
       <button disabled={!isValid || saving} className="w-full rounded-2xl bg-teal-700 px-4 py-3 font-semibold text-white disabled:bg-slate-300">{saving ? 'Saving locally...' : 'Save offline'}</button>
       {message && <p className="rounded-2xl bg-slate-100 p-3 text-sm text-slate-700">{message}</p>}

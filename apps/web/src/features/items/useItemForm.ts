@@ -1,8 +1,10 @@
 import { useMemo, useState } from 'react';
 
-export interface ItemFormState { name: string; category: string; locationId: string; notes: string; dueAt: string; tagNames: string[]; }
+import type { RetainedPhotoPayload } from '../../media/photoRetentionPolicy';
+
+export interface ItemFormState { name: string; category: string; locationId: string; notes: string; dueAt: string; tagNames: string[]; photo?: RetainedPhotoPayload; }
 export type ItemFormErrors = Partial<Record<keyof ItemFormState, string>>;
-export const emptyItemForm: ItemFormState = { name: '', category: '', locationId: '', notes: '', dueAt: '', tagNames: [] };
+export const emptyItemForm: ItemFormState = { name: '', category: '', locationId: '', notes: '', dueAt: '', tagNames: [], photo: undefined };
 
 export function validateItemForm(state: ItemFormState): ItemFormErrors {
   const errors: ItemFormErrors = {};

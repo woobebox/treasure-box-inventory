@@ -63,3 +63,11 @@ Expected result: pending SyncOp is pushed via Supabase Edge Function and marked 
 3. Simulate `deleted_at` older than 30 days and run cleanup.
 
 Expected result: item can be restored within the window and permanently deleted after retention expires.
+
+## Phase 12 Verification Notes (2026-06-23)
+
+- TypeScript, lint, Vitest smoke/unit coverage, production build, and whitespace checks were run locally after Phase 10 and Phase 11 implementation.
+- Lighthouse PWA audit: production assets build successfully with the existing manifest, offline fallback, service worker registration, and Workbox runtime cache configuration. A browser-driven Lighthouse score capture still requires running Chrome DevTools or CI browser automation outside this shell.
+- Chrome/Edge Android behavior: responsive app shell, file upload fallback, camera capture hint (`capture="environment"`), storage persistence request, and IndexedDB-backed offline flows are implemented in code. Physical Android validation remains a release-device checklist item.
+- Safari iOS/iPadOS behavior: the photo flow uses standard `<input type="file" accept="image/*">` with camera capture hints and canvas JPEG re-encoding, and storage settings gracefully check `navigator.storage` availability. Physical iOS/iPadOS validation remains a release-device checklist item.
+- Supabase authorization negative cases: RLS policies in `supabase/migrations/004_rls_policies.sql` remain the source of truth for household isolation; client admin-only delete/restore and member management paths deny non-admin members before mutation.

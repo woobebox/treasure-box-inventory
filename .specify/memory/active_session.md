@@ -1,11 +1,18 @@
 # Current Session Progress
 
 - **Current Active Feature**: `001-local-first-pwa-inventory`
-- **Latest Verified Action**: Fixed the Phase 8/9 TypeScript regression on 2026-06-23 by passing Dexie transaction tables as arrays and revalidating typecheck, lint, tests, build, and whitespace checks.
-- **Current Blockers**: none for the Phase 8/9 typecheck follow-up.
-- **Next Best Action**: Continue with Phase 10 tasks beginning at T074 when requested.
+- **Latest Verified Action**: Completed Phase 10, Phase 11, and Phase 12 on 2026-06-23 with photo privacy hardening, backup/retention/reminder flows, and local verification.
+- **Current Blockers**: Browser/device-specific Lighthouse, Android, and iOS/iPadOS checks are documented as release-device follow-ups because this shell has no interactive browser/device harness.
+- **Next Best Action**: Review the Phase 12 notes, run physical browser/device audits if required, then merge the implementation PR.
 
 ## Session Log
+
+### 2026-06-23 Phase 10-12 Photo Privacy, Backup, and Verification
+
+- **Completed Action**: Continued `/speckit.implement` for Phase 10, Phase 11, and Phase 12. Added upload/camera photo capture wrappers, canvas JPEG re-encoding, thumbnails, photo retention policy enforcement, PhotoInput integration, 30-day restore/cleanup helpers, backup JSON/CSV export, restore dry-run validation, backup settings UI, reminder list UI, tests, task checklist updates, and quickstart verification notes.
+- **Verification**: `npm run typecheck`, `npm run lint`, `npm test`, `npm run build`, and `git diff --check` passed locally. Browser/device-specific Lighthouse, Android, and iOS/iPadOS checks were recorded as follow-up notes in quickstart because no interactive device/browser audit harness is available in this shell.
+- **Current Blockers**: none for code-level verification; physical browser/device audits remain release follow-ups.
+- **Next Best Action**: Review and merge the PR after any desired browser/device audit.
 
 ### 2026-06-23 Phase 8/9 Typecheck Follow-up
 
