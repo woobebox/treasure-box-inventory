@@ -4,6 +4,7 @@ import { HomePage } from '../features/home/HomePage';
 import { StorageSettings } from '../features/settings/StorageSettings';
 import { SyncSettings } from '../features/settings/SyncSettings';
 import { HouseholdSettingsPage } from '../features/households/HouseholdSettingsPage';
+import { BackupSettings } from '../features/settings/BackupSettings';
 import { LocationsPage } from '../features/locations/LocationsPage';
 import { SearchPage } from '../features/search/SearchPage';
 import { bottomNavRoutes } from './routes';
@@ -38,7 +39,7 @@ export function App() {
           ) : path === '/search' ? (
             <SearchPage />
           ) : path === '/settings' ? (
-            <div className="space-y-6"><StorageSettings /><SyncSettings /><HouseholdSettingsPage /></div>
+            <div className="space-y-6"><StorageSettings /><SyncSettings /><BackupSettings /><HouseholdSettingsPage /></div>
           ) : path.startsWith('/items/') ? (
             <ItemDetailPage itemId={decodeURIComponent(path.split('/').pop() ?? '')} />
           ) : (

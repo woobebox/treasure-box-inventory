@@ -139,13 +139,13 @@
 
 **Independent Test**: Upload a photo with EXIF metadata, verify canvas re-encoded blobs are persisted, and verify backup/export excludes originals.
 
-- [ ] T074 [P] Implement file upload fallback in `apps/web/src/media/fileInput.ts`
-- [ ] T075 [P] Implement camera capture wrapper in `apps/web/src/media/cameraCapture.ts`
-- [ ] T076 Implement image decode, resize, and canvas re-encode pipeline in `apps/web/src/media/imageProcessor.ts`
-- [ ] T077 Implement thumbnail generation in `apps/web/src/media/thumbnail.ts`
-- [ ] T078 Enforce original release and metadata policy in `apps/web/src/media/photoRetentionPolicy.ts`
-- [ ] T079 Connect photo capture to add/edit item flow in `apps/web/src/features/items/PhotoInput.tsx`
-- [ ] T080 Add photo retention privacy test in `apps/web/src/test/photo-retention.test.ts`
+- [x] T074 [P] Implement file upload fallback in `apps/web/src/media/fileInput.ts`
+- [x] T075 [P] Implement camera capture wrapper in `apps/web/src/media/cameraCapture.ts`
+- [x] T076 Implement image decode, resize, and canvas re-encode pipeline in `apps/web/src/media/imageProcessor.ts`
+- [x] T077 Implement thumbnail generation in `apps/web/src/media/thumbnail.ts`
+- [x] T078 Enforce original release and metadata policy in `apps/web/src/media/photoRetentionPolicy.ts`
+- [x] T079 Connect photo capture to add/edit item flow in `apps/web/src/features/items/PhotoInput.tsx`
+- [x] T080 Add photo retention privacy test in `apps/web/src/test/photo-retention.test.ts`
 
 ## Phase 11: Soft delete, import/export, backup, and reminders
 
@@ -153,26 +153,26 @@
 
 **Independent Test**: Delete and restore within 30 days, simulate cleanup after 30 days, export JSON manifest, dry-run restore, and verify due items appear in reminders.
 
-- [ ] T081 [P] Implement 30-day soft delete retention helpers in `apps/web/src/domain/retention.ts`
-- [ ] T082 Implement restore and cleanup workflow in `apps/web/src/features/items/deleteRestoreItem.ts`
-- [ ] T083 [P] Implement JSON export manifest writer in `apps/web/src/features/backup/exportManifest.ts`
-- [ ] T084 [P] Implement CSV export in `apps/web/src/features/backup/exportCsv.ts`
-- [ ] T085 Implement restore dry-run schema validation in `apps/web/src/features/backup/restoreDryRun.ts`
-- [ ] T086 Implement backup and restore UI in `apps/web/src/features/settings/BackupSettings.tsx`
-- [ ] T087 Implement app-internal reminder list in `apps/web/src/features/reminders/ReminderList.tsx`
-- [ ] T088 Add backup manifest and soft delete tests in `apps/web/src/test/backup-retention.test.ts`
+- [x] T081 [P] Implement 30-day soft delete retention helpers in `apps/web/src/domain/retention.ts`
+- [x] T082 Implement restore and cleanup workflow in `apps/web/src/features/items/deleteRestoreItem.ts`
+- [x] T083 [P] Implement JSON export manifest writer in `apps/web/src/features/backup/exportManifest.ts`
+- [x] T084 [P] Implement CSV export in `apps/web/src/features/backup/exportCsv.ts`
+- [x] T085 Implement restore dry-run schema validation in `apps/web/src/features/backup/restoreDryRun.ts`
+- [x] T086 Implement backup and restore UI in `apps/web/src/features/settings/BackupSettings.tsx`
+- [x] T087 Implement app-internal reminder list in `apps/web/src/features/reminders/ReminderList.tsx`
+- [x] T088 Add backup manifest and soft delete tests in `apps/web/src/test/backup-retention.test.ts`
 
 ## Phase 12: Polish and Cross-Cutting Verification
 
-- [ ] T089 Run TypeScript check and fix issues in `apps/web/tsconfig.json`
-- [ ] T090 Run lint and fix issues in `apps/web/eslint.config.js`
-- [ ] T091 Run production build and fix issues in `apps/web/package.json`
-- [ ] T092 Run unit and smoke tests documented in `apps/web/src/test/`
-- [ ] T093 Run Lighthouse PWA audit and record notes in `.specify/features/001-local-first-pwa-inventory/quickstart.md`
-- [ ] T094 Verify Chrome/Edge Android behavior and record notes in `.specify/features/001-local-first-pwa-inventory/quickstart.md`
-- [ ] T095 Verify Safari iOS/iPadOS camera, storage, and PWA behavior and record notes in `.specify/features/001-local-first-pwa-inventory/quickstart.md`
-- [ ] T096 Verify Supabase RLS and Edge Function negative authorization cases against `supabase/migrations/004_rls_policies.sql`
-- [ ] T097 Run `git diff --check` before finishing the implementation phase
+- [x] T089 Run TypeScript check and fix issues in `apps/web/tsconfig.json`
+- [x] T090 Run lint and fix issues in `apps/web/eslint.config.js`
+- [x] T091 Run production build and fix issues in `apps/web/package.json`
+- [x] T092 Run unit and smoke tests documented in `apps/web/src/test/`
+- [x] T093 Run Lighthouse PWA audit and record notes in `.specify/features/001-local-first-pwa-inventory/quickstart.md`
+- [x] T094 Verify Chrome/Edge Android behavior and record notes in `.specify/features/001-local-first-pwa-inventory/quickstart.md`
+- [x] T095 Verify Safari iOS/iPadOS camera, storage, and PWA behavior and record notes in `.specify/features/001-local-first-pwa-inventory/quickstart.md`
+- [x] T096 Verify Supabase RLS and Edge Function negative authorization cases against `supabase/migrations/004_rls_policies.sql`
+- [x] T097 Run `git diff --check` before finishing the implementation phase
 
 ## Dependencies
 
