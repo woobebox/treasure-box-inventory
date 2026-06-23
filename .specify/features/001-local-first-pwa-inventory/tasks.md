@@ -106,18 +106,18 @@
 
 **Independent Test**: Create a pending SyncOp offline, restore network, push through Edge Function, mark op synced, then pull household-scoped changes.
 
-- [ ] T055 [P] [US6] Create Supabase migration for households and members in `supabase/migrations/001_households_members.sql`
-- [ ] T056 [P] [US6] Create Supabase migration for inventory tables in `supabase/migrations/002_inventory_core.sql`
-- [ ] T057 [P] [US6] Create Supabase migration for sync, history, conflicts, and backups in `supabase/migrations/003_sync_history_backup.sql`
-- [ ] T058 [US6] Add Supabase RLS policies for household membership isolation in `supabase/migrations/004_rls_policies.sql`
-- [ ] T059 [US6] Add private Supabase Storage bucket policy for compressed photos in `supabase/migrations/005_storage_policies.sql`
-- [ ] T060 [US6] Implement Edge Function sync push handler in `supabase/functions/sync/push.ts`
-- [ ] T061 [US6] Implement Edge Function sync changes handler in `supabase/functions/sync/changes.ts`
-- [ ] T062 [US6] Implement client Outbox queue reader and retry/backoff in `apps/web/src/sync/outbox.ts`
-- [ ] T063 [US6] Implement client pull cursor handling in `apps/web/src/sync/pull.ts`
-- [ ] T064 [US6] Implement conflict queue persistence in `apps/web/src/sync/conflicts.ts`
-- [ ] T065 [US6] Implement sync status UI and manual sync button in `apps/web/src/features/settings/SyncSettings.tsx`
-- [ ] T066 [US6] Add sync recovery smoke test in `apps/web/src/test/sync-recovery.test.ts`
+- [x] T055 [P] [US6] Create Supabase migration for households and members in `supabase/migrations/001_households_members.sql`
+- [x] T056 [P] [US6] Create Supabase migration for inventory tables in `supabase/migrations/002_inventory_core.sql`
+- [x] T057 [P] [US6] Create Supabase migration for sync, history, conflicts, and backups in `supabase/migrations/003_sync_history_backup.sql`
+- [x] T058 [US6] Add Supabase RLS policies for household membership isolation in `supabase/migrations/004_rls_policies.sql`
+- [x] T059 [US6] Add private Supabase Storage bucket policy for compressed photos in `supabase/migrations/005_storage_policies.sql`
+- [x] T060 [US6] Implement Edge Function sync push handler in `supabase/functions/sync/push.ts`
+- [x] T061 [US6] Implement Edge Function sync changes handler in `supabase/functions/sync/changes.ts`
+- [x] T062 [US6] Implement client Outbox queue reader and retry/backoff in `apps/web/src/sync/outbox.ts`
+- [x] T063 [US6] Implement client pull cursor handling in `apps/web/src/sync/pull.ts`
+- [x] T064 [US6] Implement conflict queue persistence in `apps/web/src/sync/conflicts.ts`
+- [x] T065 [US6] Implement sync status UI and manual sync button in `apps/web/src/features/settings/SyncSettings.tsx`
+- [x] T066 [US6] Add sync recovery smoke test in `apps/web/src/test/sync-recovery.test.ts`
 
 ## Phase 9: User Story 7 - Household membership and least privilege
 
@@ -125,13 +125,13 @@
 
 **Independent Test**: Sign in as admin and member, verify admin can invite/remove and delete/restore, while member can create/edit/move but receives authorization errors for delete and member management.
 
-- [ ] T067 [P] [US7] Implement auth session provider in `apps/web/src/services/auth.tsx`
-- [ ] T068 [US7] Implement household membership repository in `apps/web/src/db/householdRepository.ts`
-- [ ] T069 [US7] Implement household settings page in `apps/web/src/features/households/HouseholdSettingsPage.tsx`
-- [ ] T070 [US7] Implement invite and remove member flows in `apps/web/src/features/households/MemberManagement.tsx`
-- [ ] T071 [US7] Enforce admin-only delete/restore in `apps/web/src/features/items/deleteRestoreItem.ts`
-- [ ] T072 [US7] Add permission-denied UI messages in `apps/web/src/components/PermissionNotice.tsx`
-- [ ] T073 [US7] Add household authorization smoke test in `apps/web/src/test/household-authorization.test.ts`
+- [x] T067 [P] [US7] Implement auth session provider in `apps/web/src/services/auth.tsx`
+- [x] T068 [US7] Implement household membership repository in `apps/web/src/db/householdRepository.ts`
+- [x] T069 [US7] Implement household settings page in `apps/web/src/features/households/HouseholdSettingsPage.tsx`
+- [x] T070 [US7] Implement invite and remove member flows in `apps/web/src/features/households/MemberManagement.tsx`
+- [x] T071 [US7] Enforce admin-only delete/restore in `apps/web/src/features/items/deleteRestoreItem.ts`
+- [x] T072 [US7] Add permission-denied UI messages in `apps/web/src/components/PermissionNotice.tsx`
+- [x] T073 [US7] Add household authorization smoke test in `apps/web/src/test/household-authorization.test.ts`
 
 ## Phase 10: Photo pipeline and privacy hardening
 
