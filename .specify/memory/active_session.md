@@ -1,11 +1,18 @@
 # Current Session Progress
 
 - **Current Active Feature**: `001-local-first-pwa-inventory`
-- **Latest Verified Action**: Fixed React hooks lint findings for T033-T043 on 2026-06-22 by removing synchronous state resets from effects and remounting the location form by editing key.
+- **Latest Verified Action**: Completed `/speckit.implement` scope limited to Phase 8 and Phase 9 on 2026-06-22, covering Supabase sync migrations/functions/client UI and household membership least-privilege flows.
 - **Current Blockers**: Local dependency installation still fails with npm registry `403 Forbidden`, so npm verification remains blocked by missing dependencies in this environment.
-- **Next Best Action**: Re-run Web CI where npm dependencies are available; if it passes, continue with US4 tasks beginning at T044.
+- **Next Best Action**: Re-run Web CI where npm dependencies are available; if it passes, continue with Phase 10 tasks beginning at T074.
 
 ## Session Log
+
+### 2026-06-22 Phase 8 Supabase Sync and Phase 9 Household Authorization
+
+- **Completed Action**: Continued `/speckit.implement` with the user-requested scope limited to Phase 8 and Phase 9. Completed T055-T073 by adding Supabase Postgres/RLS/Storage migrations, sync push and changes Edge Function handlers, client outbox/pull/conflict helpers, sync settings UI, auth provider, household repository/settings/member management UI, admin-only delete/restore helpers, permission notice component, and smoke tests for sync recovery and household authorization. Did not start Phase 10 or later tasks.
+- **Verification**: `npm install` failed with `403 Forbidden - GET https://registry.npmjs.org/@eslint%2fjs`, leaving dependencies unavailable. `npm run typecheck` failed because `vite/client` and `node` type definitions are missing. `npm test` failed because `vitest` is not installed. `npm run lint` failed because `@eslint/js` is missing. `npm run build` failed at the same missing type definitions. `git diff --check` passed.
+- **Current Blockers**: npm dependencies remain unavailable locally due to npm registry `403 Forbidden`, preventing full local verification.
+- **Next Best Action**: Run `npm install`, `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build` in GitHub Actions or an approved npm registry environment, then continue with Phase 10 tasks beginning at T074.
 
 ### 2026-06-22 React Hooks Lint Fix for T033-T043
 
