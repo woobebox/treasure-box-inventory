@@ -22,6 +22,7 @@ export function LocationForm({ householdId, editing, onSaved, actorId, deviceId 
     event.preventDefault();
     try {
       const saved = editing ? await updateLocation({ id: editing.id, householdId, name, type, parentId: parentId || null, actorId, deviceId }) : await createLocation({ householdId, name, type, parentId: parentId || null, actorId, deviceId });
+      setLocations(await listLocationsByHousehold(householdId));
       setMessage('位置已離線儲存'); setName(''); setParentId(''); onSaved(saved);
     } catch (error) { setMessage(error instanceof Error ? error.message : '位置儲存失敗'); }
   }

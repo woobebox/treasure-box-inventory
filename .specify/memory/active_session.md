@@ -1,9 +1,9 @@
 # Current Session Progress
 
 - **Current Active Feature**: `001-local-first-pwa-inventory`
-- **Latest Verified Action**: 2026-07-01 — 備份操作視覺與文案再優化：下載 JSON、下載 CSV、匯入 JSON 三個操作統一為 teal 淺底/外框/文字樣式及一致 hover/focus；「選擇 JSON 備份」改為更明確的「匯入 JSON 備份資料」。前一批真正下載與 JSON merge restore 功能維持。
-- **Current Blockers**: 程式面無 blocker；變更尚未 commit/push，GitHub Pages 尚未包含本次修正。實機手機下載仍需部署後點測；內建瀏覽器可確認 JSON/CSV 皆為帶日期檔名的直接 Blob download link，但其 automation backend 不回報 Blob download event。
-- **Next Best Action**: review 後 commit + push main 觸發 Pages；在線上手機與桌機各下載一次 JSON/CSV，再用剛下載的 JSON 驗證「選擇→預覽→確認匯入並合併」。
+- **Latest Verified Action**: 2026-07-01 — 修正位置管理新增後「上層位置」下拉未即時刷新；新增物品頁的位置欄位加入與分類一致的 `+ / ×` 快速新增，支援名稱、類型、上層位置，建立後自動選取並寫入同步 outbox。
+- **Current Blockers**: 程式面無 blocker；本次變更尚未 commit/push，GitHub Pages 尚未包含位置互動修正。
+- **Next Best Action**: review 後 commit + push main 觸發 Pages，部署後以手機點測快速新增位置的兩欄選單與觸控尺寸。
 
 ## Session Memory Routine（依使用者要求 2026-06-29）
 
@@ -12,6 +12,13 @@
 - 本檔即為跨 session 記憶來源；`AGENTS.md` 規則 1 與 5 已涵蓋此流程。
 
 ## Session Log
+
+### 2026-07-01 位置即時刷新與新增物品快速新增位置
+
+- **Completed Action**: `LocationForm` 儲存後立即重讀家庭位置，讓剛新增的位置立刻出現在「無上層位置」下拉；`LocationPicker` 依既有分類互動加入 `+ / ×` 展開控制，可輸入位置名稱並選擇類型與上層位置，建立後更新選項、自動選取新位置、收合面板並回焦主選單。`AddItemPage` 傳入 actor/device，使快速新增位置一併建立待同步 op。Spec tasks 新增並完成 T098-T100，新增兩個 UI 回歸測試。
+- **Verification**: Codex bundled Node 直接執行 `tsc -b --pretty false`、`eslint .`、`vitest run`（18 files / 39 tests passed）、`tsc -b && vite build`、`git diff --check` 全通過。內建瀏覽器純離線 production preview 實際確認：位置 `+` 展開後變 `×`、快速建立「點測玄關櫃」後主選單立即選取；位置管理新增「點測儲藏室」後，上層位置選單立即同時顯示兩個位置。
+- **Current Blockers**: none；尚未 commit/push。
+- **Next Best Action**: review 後 commit/push main，Pages 部署後以手機驗收。
 
 ### 2026-07-01 備份操作按鈕一致化
 

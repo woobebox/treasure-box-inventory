@@ -59,7 +59,7 @@ export function AddItemPage() {
         {visibleErrors.category && <p className="mt-1 text-xs text-rose-600">{visibleErrors.category}</p>}
       </div>
       <div>
-        <LocationPicker householdId={householdId} value={state.locationId} onChange={(locationId) => setState({ ...state, locationId })} required />
+        <LocationPicker householdId={householdId} value={state.locationId} onChange={(locationId) => setState({ ...state, locationId })} actorId={userId} deviceId={deviceId} required />
         {visibleErrors.locationId && <p className="mt-1 text-xs text-rose-600">{visibleErrors.locationId}</p>}
       </div>
       <div>

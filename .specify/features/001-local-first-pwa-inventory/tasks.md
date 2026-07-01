@@ -174,6 +174,16 @@
 - [x] T096 Verify Supabase RLS and Edge Function negative authorization cases against `supabase/migrations/004_rls_policies.sql`
 - [x] T097 Run `git diff --check` before finishing the implementation phase
 
+## Phase 13: Location creation interaction follow-up
+
+**Goal**: Newly created locations are immediately reusable as parents, and users can create/select a location without leaving the add-item page.
+
+**Independent Test**: Create a location on the Locations page and immediately select it as the next location's parent; from Add Item, expand the location quick-add control, create a location, and verify it is selected.
+
+- [x] T098 [US2] Refresh the parent-location options immediately after saving in `apps/web/src/features/locations/LocationForm.tsx`
+- [x] T099 [US1] Add an inline `+` / `×` location creation flow to `apps/web/src/features/locations/LocationPicker.tsx` and connect household actor/device context from `apps/web/src/features/items/AddItemPage.tsx`
+- [x] T100 Add location creation interaction regression tests in `apps/web/src/test/location-creation-ui.test.tsx`
+
 ## Dependencies
 
 - Phase 1 Setup blocks all implementation work.
