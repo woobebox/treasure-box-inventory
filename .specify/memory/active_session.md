@@ -1,9 +1,9 @@
 # Current Session Progress
 
 - **Current Active Feature**: `001-local-first-pwa-inventory`
-- **Latest Verified Action**: 2026-07-01 — 修正 GitHub Pages 實測問題：首頁最近物品現在會把 `currentLocationId` 解析為位置 `path`；同步摘要納入失敗筆數；新增並已套用 Supabase migration `007_photos_version.sql`，補齊 `photos.version`，排除 PostgREST schema cache 的 version column 錯誤；照片移除同步改用 version/baseVersion 樂觀鎖。
-- **Current Blockers**: 程式與 Supabase migration 均無 blocker；修正已提交為 `c38dcf6`，但此環境缺少 GitHub HTTPS credentials，`git push origin main` 失敗，GitHub Pages 尚未包含前端修正。
-- **Next Best Action**: 在已登入 GitHub 的環境執行 `git push origin main` 觸發 Pages 部署；之後線上驗收首頁位置顯示並再次按「立即同步」重試先前失敗的 outbox op。
+- **Latest Verified Action**: 2026-07-01 — 備份操作視覺與文案再優化：下載 JSON、下載 CSV、匯入 JSON 三個操作統一為 teal 淺底/外框/文字樣式及一致 hover/focus；「選擇 JSON 備份」改為更明確的「匯入 JSON 備份資料」。前一批真正下載與 JSON merge restore 功能維持。
+- **Current Blockers**: 程式面無 blocker；變更尚未 commit/push，GitHub Pages 尚未包含本次修正。實機手機下載仍需部署後點測；內建瀏覽器可確認 JSON/CSV 皆為帶日期檔名的直接 Blob download link，但其 automation backend 不回報 Blob download event。
+- **Next Best Action**: review 後 commit + push main 觸發 Pages；在線上手機與桌機各下載一次 JSON/CSV，再用剛下載的 JSON 驗證「選擇→預覽→確認匯入並合併」。
 
 ## Session Memory Routine（依使用者要求 2026-06-29）
 
@@ -12,6 +12,20 @@
 - 本檔即為跨 session 記憶來源；`AGENTS.md` 規則 1 與 5 已涵蓋此流程。
 
 ## Session Log
+
+### 2026-07-01 備份操作按鈕一致化
+
+- **Completed Action**: `BackupSettings.tsx` 抽出共用 `backupActionClass`，將「下載 JSON 備份」、「下載 CSV 摘要」與匯入控制統一成 teal 淺底、teal 外框與文字，補一致 hover 與鍵盤 focus ring；準備中狀態亦統一。匯入文案由「選擇 JSON 備份」改為「匯入 JSON 備份資料」。
+- **Verification**: bundled Node 執行 `tsc -b --pretty false`、`eslint .`、`vitest run`（17 files / 37 tests passed）、`vite build`、`git diff --check` 全通過；僅有既存 bundle >500 kB warning。
+- **Current Blockers**: 變更尚未 commit/push，GitHub Pages 尚未部署。
+- **Next Best Action**: review 後 commit/push main，部署後手機確認三個操作的換行與觸控尺寸。
+
+### 2026-07-01 備份下載與 JSON 真正還原
+
+- **Completed Action**: 找到匯出按鈕原先只呼叫 `exportManifest`/`exportItemsCsv` 後顯示文字，沒有建立任何下載。新增 `downloadFile.ts`，設定頁載入時預先建立 JSON/CSV Blob URL，UI 改為原生 `<a download>`（日期檔名；CSV 加 UTF-8 BOM）。JSON manifest 新增 history。新增 `restoreManifest.ts`，先沿用 dry-run schema/照片政策檢查，再拒絕跨家庭資料，最後以單一 Dexie transaction 合併 locations/items/photos/tags/itemTags/history；同 ID 更新、其他現有資料保留。UI 將「試算還原」改為「選擇 JSON 備份」，顯示格式與筆數後才提供「確認匯入並合併」；CSV 明示為摘要、不能完整還原。
+- **Verification**: bundled Node 執行 `tsc -b --pretty false`、`eslint .`、`vitest run`（17 files / 37 tests passed）、`tsc -b && vite build`、`git diff --check` 全通過。新增日期檔名、同家庭 merge restore、跨家庭拒絕測試。內建瀏覽器於純離線 `/settings` 驗證新文案與兩個直接下載 link，JSON/CSV href 均為 Blob URL，download 分別為 `treasure-box-2026-07-01.json`/`.csv`。`waitForEvent("download")` 對 Blob URL 於 automation backend timeout，未能作為檔案落盤證據；實機手機下載需部署後驗收。
+- **Current Blockers**: 變更尚未 commit/push；GitHub Pages 尚未部署本次修正。
+- **Next Best Action**: commit/push main，等待 Pages 後以手機與桌機各執行一次下載及 JSON 還原。
 
 ### 2026-07-01 首頁位置顯示與 photos.version 同步修復
 
