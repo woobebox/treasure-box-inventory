@@ -12,3 +12,10 @@ export const schemaV1 = {
   conflicts: 'id, householdId, syncOpId, entityType, entityId, resolvedAt',
   settings: '[householdId+key], householdId, key, updatedAt'
 } as const;
+
+// v2 adds a device-local store for photo thumbnail Blobs. This is intentionally
+// NOT part of the sync surface (sync only carries metadata), so it never appears
+// in syncOps payloads or the cloud schema.
+export const schemaV2 = {
+  photoBlobs: 'photoId'
+} as const;

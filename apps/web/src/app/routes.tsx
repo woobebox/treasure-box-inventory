@@ -12,12 +12,12 @@ export interface AppRoute {
 }
 
 export const appRoutes: AppRoute[] = [
-  { id: 'home', path: '/', label: 'Home', icon: Home, showInBottomNav: true },
-  { id: 'locations', path: '/locations', label: 'Locations', icon: Map, showInBottomNav: true },
-  { id: 'add', path: '/add', label: 'Add', icon: PlusCircle, showInBottomNav: true },
-  { id: 'search', path: '/search', label: 'Search', icon: Search, showInBottomNav: true },
-  { id: 'settings', path: '/settings', label: 'Settings', icon: Settings, showInBottomNav: true },
-  { id: 'item-detail', path: '/items/:itemId', label: 'Item Detail', icon: Archive, showInBottomNav: false }
+  { id: 'home', path: '/', label: '首頁', icon: Home, showInBottomNav: true },
+  { id: 'locations', path: '/locations', label: '位置', icon: Map, showInBottomNav: true },
+  { id: 'add', path: '/add', label: '新增', icon: PlusCircle, showInBottomNav: true },
+  { id: 'search', path: '/search', label: '搜尋', icon: Search, showInBottomNav: true },
+  { id: 'settings', path: '/settings', label: '設定', icon: Settings, showInBottomNav: true },
+  { id: 'item-detail', path: '/items/:itemId', label: '物品詳情', icon: Archive, showInBottomNav: false }
 ];
 
 export const bottomNavRoutes = appRoutes.filter((route) => route.showInBottomNav);

@@ -19,7 +19,7 @@ describe('offline item creation', () => {
       category: 'Clothing',
       currentLocationId: 'drawer-1',
       notes: 'Keep by the door',
-      dueAt: null,
+     
       tagNames: ['winter', 'clothing'],
       photo: {
         storageKey: 'household-1/items/main.webp',
@@ -54,12 +54,12 @@ describe('offline item creation', () => {
 
     const syncOps = await db.syncOps.where('entityId').equals(result.itemId).toArray();
     expect(syncOps).toHaveLength(1);
-    expect(syncOps[0]).toMatchObject({ householdId: 'household-1', status: 'pending', entityType: 'item' });
+    expect(syncOps[0]).toMatchObject({ householdId: 'household-1', status: 'pending', entityType: 'items', opType: 'item.create' });
   });
 
   it('rejects missing household scope', async () => {
     await expect(createItem({
-      householdId: '', createdBy: 'user-1', updatedBy: 'user-1', deviceId: 'device-1', name: 'Box', category: 'Storage', currentLocationId: 'loc-1', notes: '', dueAt: null, tagNames: []
+      householdId: '', createdBy: 'user-1', updatedBy: 'user-1', deviceId: 'device-1', name: 'Box', category: 'Storage', currentLocationId: 'loc-1', notes: '', tagNames: []
     })).rejects.toThrow('household_id is required');
   });
 });

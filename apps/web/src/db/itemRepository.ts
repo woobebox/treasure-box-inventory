@@ -11,21 +11,19 @@ export interface ItemDraft {
   name: string;
   category: string;
   notes?: string;
-  dueAt?: string | null;
   coverPhotoId?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
 
 export function validateItemDraft(draft: ItemDraft): void {
-  if (!draft.householdId.trim()) throw new Error('household_id is required');
-  if (!draft.createdBy.trim()) throw new Error('createdBy is required');
-  if (!draft.updatedBy.trim()) throw new Error('updatedBy is required');
-  if (!draft.currentLocationId.trim()) throw new Error('currentLocationId is required');
-  if (!draft.name.trim()) throw new Error('Item name is required');
-  if (draft.name.trim().length > 120) throw new Error('Item name must be 120 characters or less');
-  if (!draft.category.trim()) throw new Error('Category is required');
-  if (draft.dueAt && Number.isNaN(Date.parse(draft.dueAt))) throw new Error('dueAt must be a valid ISO date');
+  if (!draft.householdId.trim()) throw new Error('缺少家庭識別碼');
+  if (!draft.createdBy.trim()) throw new Error('缺少建立者識別碼');
+  if (!draft.updatedBy.trim()) throw new Error('缺少更新者識別碼');
+  if (!draft.currentLocationId.trim()) throw new Error('請選擇位置');
+  if (!draft.name.trim()) throw new Error('請輸入物品名稱');
+  if (draft.name.trim().length > 120) throw new Error('物品名稱最多 120 字');
+  if (!draft.category.trim()) throw new Error('請輸入分類');
 }
 
 export function buildItem(draft: ItemDraft): Item {
@@ -43,7 +41,6 @@ export function buildItem(draft: ItemDraft): Item {
     category: draft.category.trim(),
     status: 'active',
     notes: draft.notes?.trim() || undefined,
-    dueAt: draft.dueAt ?? null,
     createdAt: timestamp,
     updatedAt: draft.updatedAt ?? timestamp,
     deletedAt: null,
@@ -52,18 +49,18 @@ export function buildItem(draft: ItemDraft): Item {
 }
 
 export async function putItem(item: Item): Promise<string> {
-  if (!item.householdId) throw new Error('household_id is required');
+  if (!item.householdId) throw new Error('缺少家庭識別碼');
   return db.items.put(item);
 }
 
 export async function getItemById(householdId: string, itemId: string): Promise<Item | undefined> {
-  if (!householdId) throw new Error('household_id is required');
+  if (!householdId) throw new Error('缺少家庭識別碼');
   const item = await db.items.get(itemId);
   return item?.householdId === householdId ? item : undefined;
 }
 
 export async function listItemsByHousehold(householdId: string): Promise<Item[]> {
-  if (!householdId) throw new Error('household_id is required');
+  if (!householdId) throw new Error('缺少家庭識別碼');
   return db.items.where('householdId').equals(householdId).filter((item) => !item.deletedAt).toArray();
 }
 

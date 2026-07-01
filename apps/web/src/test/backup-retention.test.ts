@@ -16,7 +16,7 @@ describe('backup and soft delete retention', () => {
   });
 
   it('exports item CSV safely', () => {
-    const csv = exportItemsCsv([{ id: 'i1', name: 'Box, blue', category: 'storage', status: 'active', currentLocationId: 'l1', dueAt: null, updatedAt: 'now' } as never]);
+    const csv = exportItemsCsv([{ id: 'i1', name: 'Box, blue', category: 'storage', status: 'active', currentLocationId: 'l1', updatedAt: 'now' } as never]);
     expect(csv).toContain('"Box, blue"');
   });
 });

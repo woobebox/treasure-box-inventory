@@ -1,0 +1,12 @@
+# Supabase CLI project configuration.
+# `project_id` is a local label; the real cloud project is bound via
+# `supabase link --project-ref <ref>` (see docs/supabase-deploy.md).
+project_id = "nrjbazjyqqqjpgrnrmmz"
+
+[functions.sync]
+# Gateway JWT verification stays on. Supabase's gateway already exempts the
+# unauthenticated CORS preflight (OPTIONS) from this check, so the preflight
+# reaches the function (which returns CORS headers); authenticated POST/GET
+# requests carry the user's JWT as usual. The function also re-checks auth
+# internally via supabase.auth.getUser().
+verify_jwt = true

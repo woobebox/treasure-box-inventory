@@ -1,8 +1,9 @@
 {
-  "name": "Treasure Box Inventory",
-  "short_name": "Treasure Box",
-  "description": "Local-first household photo inventory",
-  "start_url": "/",
+  "name": "收納寶盒庫存管理",
+  "short_name": "收納寶盒",
+  "description": "離線優先的家庭照片庫存管理",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#f8fafc",
   "theme_color": "#0f766e",

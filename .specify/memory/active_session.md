@@ -1,11 +1,108 @@
 # Current Session Progress
 
 - **Current Active Feature**: `001-local-first-pwa-inventory`
-- **Latest Verified Action**: Completed Phase 10, Phase 11, and Phase 12 on 2026-06-23 with photo privacy hardening, backup/retention/reminder flows, and local verification.
-- **Current Blockers**: Browser/device-specific Lighthouse, Android, and iOS/iPadOS checks are documented as release-device follow-ups because this shell has no interactive browser/device harness.
-- **Next Best Action**: Review the Phase 12 notes, run physical browser/device audits if required, then merge the implementation PR.
+- **Latest Verified Action**: 2026-07-01 — GitHub Pages 部署就緒（連雲端同步版、push main 自動部署）：vite base 設 `/treasure-box-inventory/`、新增 basePath 助手改造手寫路由與所有內部連結、manifest/SW/appShell 快取改 base-aware、新增 `deploy-pages.yml`（純 git 推 gh-pages、含 404.html/.nojekyll）與部署文件。`typecheck`/`lint`/`test`(16/34)/`build` 全綠；`npm run preview` 於子路徑驗證首頁/JS/CSS/manifest 皆 200。
+- **Current Blockers**: 待使用者手動一次：repo 加 `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` secrets；首次部署後 Settings→Pages 設 Deploy from branch=gh-pages。程式面無 blocker。
+- **Next Best Action**: 使用者加 secrets → push main（或手動 Run workflow）→ 啟用 Pages → 開 https://woobebox.github.io/treasure-box-inventory/ 驗收（載入、登入、同步、深層連結重整不 404）。後續可選：照片跨裝置、選項同步。
+
+## Session Memory Routine（依使用者要求 2026-06-29）
+
+- **每次開始**：先讀本檔（`.specify/memory/active_session.md`），回顧上次進度、blockers、next action。
+- **每次結束**：把本次完成動作、驗證指令與結果、blockers、下一步寫回頂部摘要並在 Session Log 最前面新增一筆。
+- 本檔即為跨 session 記憶來源；`AGENTS.md` 規則 1 與 5 已涵蓋此流程。
 
 ## Session Log
+
+### 2026-07-01 GitHub Pages 部署（base path + gh-pages workflow）
+
+- **Completed Action**: `vite.config.ts` 改函式式，production base=`/treasure-box-inventory/`。新增 `src/app/basePath.ts`（`toHref`/`toLogicalPath` 以 `import.meta.env.BASE_URL` 換算）；`App.tsx` 路由（初始 path、navigate pushState、popstate、內部連結攔截、底部 nav href）全部改用 logical path + toHref；`ItemCard` 物品連結、`ItemDetailPage` 刪除後 redirect 改 toHref。PWA：`index.html` manifest 用 `%BASE_URL%`、`manifest.webmanifest` start_url/scope 改相對 `./`、`registerServiceWorker` 用 base-aware URL + catch、`workbox.cacheAppShell` 以 toHref 映射且逐項 catch（保留 precacheUrls 常數供既有測試）。新增 `.github/workflows/deploy-pages.yml`（on push main + dispatch、`contents: write`、純 shell git checkout/npm/build 帶 Supabase secrets env、複製 index→404.html + .nojekyll、force-push apps/web/dist 到 gh-pages，全程無外部 action 以符 org 政策）與 `docs/github-pages-deploy.md`。
+- **Verification**: `typecheck`/`lint`/`test`(16 files/34 passed)/`build` 全綠。build 產出 index.html 資產與 manifest 皆帶 `/treasure-box-inventory/` 前綴。`npm run preview` 於 `http://localhost:4173/treasure-box-inventory/` 首頁/JS/CSS/manifest 皆回 200。
+- **Current Blockers**: 待使用者手動：加兩個 repo secrets + 首次部署後啟用 Pages(gh-pages 分支)。
+- **Next Best Action**: 使用者依 docs/github-pages-deploy.md 操作並線上驗收。
+
+### 2026-06-30 行動版版面優化（fixed 底部導覽 + 精簡 app bar + sticky 搜尋列）
+
+- **Completed Action**: `App.tsx`：`nav` 由 flex 流改 `fixed inset-x-0 bottom-0 z-40 mx-auto max-w-md`（含 `env(safe-area-inset-bottom)`、上緣陰影），`main` 加 `pb-24` 避免內容被遮；`header` 由高區塊（pb-8 pt-10、3xl 標題、說明）精簡為 `sticky top-0 z-30 py-3` 細列、`text-lg` 標題、移除「離線優先 PWA」與說明行。`SearchFilters.tsx`：搜尋框+分類 chips 包一層 `sticky top-[52px] z-20 bg-white`，捲動結果時保持可切換；進階面板維持非 sticky。`pageCopy` 的 description 欄位現未使用但保留（無害）。
+- **Verification**: `npm run typecheck`/`lint`/`test`(16 files/34 passed)/`build` 全綠。純版面調整，無新測試。
+- **Current Blockers**: none。
+- **Next Best Action**: 使用者裝置驗收版面。
+
+### 2026-06-30 分類/位置類型重新命名（連動更新）+ 移除保護
+
+- **Completed Action**: `optionRepository.ts` 新增 `renameCategoryOption`/`renameLocationTypeOption`：驗證（非空/長度/不與現有衝突/預設不可改名），更新自訂選項清單，並**連動更新**所有使用舊名的物品(`category`)/位置(`type`)——透過 `cascadeItemCategory`/`cascadeLocationType` 在單一交易內 bump version、寫 history(item)、enqueue `item.update`/`location.update` syncOp（actor 由 UI 傳入，未提供則僅改本地）。`removeCategoryOption` 補上使用中保護（比照位置類型）。`OptionSettings.tsx` 改為每個自訂 chip 有 inline 重新命名（鉛筆）與刪除（×），預設項維持 disabled，成功訊息含連動筆數，改用 toast。
+- **Verification**: `npm run typecheck`/`lint`/`test`(16 files/34 passed，新增 option-rename)/`build` 全綠。
+- **Current Blockers**: none。
+- **Next Best Action**: 行動版版面優化（見頂部）。
+
+### 2026-06-30 物品詳情頁：相簿照片 + 刪除/還原 + UUID 修正 + 圖片解碼修復
+
+- **Completed Action**: (1) household context 補 `currentMember`（admin 判斷，離線給 DEMO_MEMBER admin）。(2) 多張照片相簿：新增 `addPhoto.ts`/`removePhoto.ts`（交易內寫 photos metadata + 本地 photoBlobs Blob、無封面時自動設封面、移除封面時轉移到其他照片、寫 history、enqueue `photo.add`/`photo.remove`，payload 不含 Blob）、`usePhotoThumbnails.ts`、`PhotoGallery.tsx`（縮圖網格、設封面星號、移除、底部用既有 PhotoInput 新增）。(3) 軟刪除/還原：`deleteRestoreItem.ts` 改新簽名（householdId/actorId/deviceId/member），交易內 update item + history + enqueue `item.delete`/`item.restore`，維持 admin only。(4) `ItemDetailPage` 整合相簿、admin 刪除（二次確認→toast→導回首頁）/還原按鈕、歷史與位置改用 locationId→名稱對照（找不到顯示「（已移除的位置）」，不再露 UUID）。(5) 修正上傳圖片「could not be decoded」：`imageProcessor.ts` 的 decode 改為 createImageBitmap 失敗時退回 `<img>`，皆失敗給 HEIC 提示；改讀 naturalWidth/Height。(6) historyRepository/labels 加刪除/還原/照片動作的中文標籤。(7) `push.ts` applyOp 加 item.delete/restore 與 photo.add/remove 落地分支，rank 維持 location<item<photo，重新部署。
+- **Verification**: `npm run typecheck` / `lint`（0 警告）/ `test`（15 files、29 passed，新增 item-photo-delete）/ `build` 全綠。`supabase functions deploy sync` 成功。尚未由使用者實機點過 UI。
+- **Current Blockers**: none。照片本體不跨裝置。
+- **Next Best Action**: 使用者實機驗收。
+
+### 2026-06-29 新增/搜尋 UI/UX 優化批次
+
+- **Completed Action**: 依使用者實機回饋優化。(1) 新增輕量 toast 系統（`components/toast/ToastProvider.tsx` + `toastContext.ts`，main.tsx 包入，global.css 加 toast-enter 動畫），AddItemPage 新增成功改用 `show('已新增物品')`。(2) 必填欄位：useItemForm 加 `submitted` 旗標與 `visibleErrors`（送出後才顯示錯誤），AddItemPage/CategoryPicker/LocationPicker 標題加紅色 `*`。(3) 完全移除期限 dueAt：useItemForm/AddItemPage/itemRepository/domain types/exportCsv(改 createdAt 欄)/各測試 fixture；刪除 `features/reminders/ReminderList.tsx` 並從 HomePage 移除。(4) 搜尋頁改版：searchService 的 `dueFrom/dueTo` 改 `createdFrom/createdTo`（比對 createdAt 前綴）；SearchFilters 拆成常駐層（搜尋框+分類 chips）與「進階篩選」滑出面板（位置/狀態/標籤/建立日期 + 啟用數 badge + 清除）。(5) ItemCard 共用卡片（縮圖/名稱/分類 chip/位置/標籤/建立日期），HomePage 與 SearchPage 清單改用。(6) 縮圖 Blob 持久化：schemaV2 新增本地專用 `photoBlobs` 表（database.ts version(2)，不進 syncOp/不上雲），createItem 同交易存縮圖 Blob，`useCoverThumbnail` 讀取產生 objectURL。
+- **Verification**: `npm run typecheck` / `lint`（0 警告）/ `test`（14 files、25 passed，新增 photo-blob-persistence、household-context、sync-mapping）/ `build` 全通過。fake-indexeddb 不保留 Blob 原型（真瀏覽器會），故該測試改驗證記錄寫入與 key 正確。尚未由使用者實機點過 UI。
+- **Current Blockers**: none。
+- **Next Best Action**: 使用者實機驗收；後續可選照片跨裝置或 GitHub Pages 部署。
+
+### 2026-06-29 跨裝置同步端到端打通（登入＋household＋雲端部署＋實機驗證）
+
+- **Completed Action**: 在後端同步邏輯補完後，接續讓「兩裝置真的同步」。(1) 雲端：新增 `006_household_bootstrap.sql`（`create_household` security definer RPC 解 households/members 的 RLS 死結），實際 `supabase db push`（001-006 全部 Remote 對齊）。(2) 前端：新增 `LoginPage`（email/password signIn/signUp）、`householdContext`/`householdContextValue`（active household、deviceId/activeHouseholdId 存 localStorage、登入後 listMyHouseholds 並 mirror 進本地 Dexie）、`cloudHousehold` service、`HouseholdOnboarding`；`App.tsx` 加登入/onboarding 守門；移除 8 頁的 `local-demo-*` 硬編碼改吃 context。(3) Edge Function 實機除錯並重部署多次：補 `_shared/cors.ts`（OPTIONS 預檢 + CORS 標頭，修「Failed to send a request to the Edge Function」）；push 依 op_type 落地寫入並加「locations 先於 items」依賴排序（修 `items_current_location_id_fkey`）；changes 修空游標（新裝置首拉從 epoch 開始，否則 `> ''` 查詢失敗被吞）並改為查詢出錯回 500 而非靜默。(4) 前端 outbox 改為「未 synced 的 op 都重試」並區分真衝突 vs 可重試錯誤；SyncSettings 加同步中鎖定/轉圈/成功失敗回饋與衝突原因列表。
+- **Verification**: `npm run typecheck` / `lint` / `test`（13 files、23 passed，新增 household-context、sync-mapping）/ `build` 全通過。實機：瀏覽器 A 同帳號登入→建立家庭→新增物品/位置→立即同步顯示「已推送 5 筆，衝突 0」；瀏覽器 B 無痕同帳號登入→立即同步顯示「拉取 13 筆」。Supabase CLI 安裝於 `~/.local/share/supabase/`（brew 因 Xcode 過舊失敗，改用預編譯 tarball，需 supabase + supabase-go 同目錄）。
+- **Current Blockers**: none。照片 Blob 跨裝置未實作。
+- **Next Best Action**: UI/UX 優化批次（見頂部 Next Best Action）。
+
+### 2026-06-29 後端同步邏輯補完（資料同步，不含照片跨裝置）
+
+- **Completed Action**: 盤點後確認後端同步「程式存在但接不起來」，依使用者核准的計畫（`~/.claude/plans/silly-soaring-ullman.md`）補完文字資料同步。修正五個斷點：①`supabase/functions/sync/push.ts` 改為依 op_type 真正 upsert items/locations/photos/tags/item_tags 並 insert history（先前只寫 sync_ops 佇列）②新增 `supabase/functions/_shared/mapping.ts` 純函式 camel↔snake mapper，`changes.ts` 用 rowToCamel 回傳 camelCase 給 pull.ts ③統一 op 命名（`createItem.ts`→`item.create`/`items`、`moveItem.ts`→`item.move`/`items`，對齊合約與 adminOps）④push.ts 加 base_version 樂觀鎖版本衝突檢查（回 `version_conflict`）⑤`locationRepository.ts` create/update 加選填 actorId/deviceId 並 enqueue location.create/update（由 `LocationsPage`/`LocationForm` 傳入 demo ids；未提供則略過維持相容）。另新增 `supabase/functions/sync/index.ts` 路由（把 `sync/push`、`sync/changes` 分派到對應 handler）、`supabase/config.toml`、`apps/web/.env.example`、`docs/supabase-deploy.md`（繁中部署步驟）、`apps/web/src/test/sync-mapping.test.ts`。更新既有測試的 op 命名斷言（offline-create-item、move-history）。
+- **Verification**: `npm run typecheck`、`npm run lint`、`npm test`（12 files / 21 tests passed）、`npm run build` 全數本機通過。端到端跨裝置同步尚未驗證（需先依文件部署 Supabase）。
+- **Current Blockers**: 雲端尚未實際建立（無 link/env）。照片 Blob 跨裝置不在本次範圍。
+- **Next Best Action**: (A) 依 `docs/supabase-deploy.md` 部署後做兩瀏覽器端到端煙霧測試；或 (B) 進行 UI/UX 優化實作。
+
+### 2026-06-29 UI/UX 全面優化計畫（規劃完成，尚未實作）
+
+- **Completed Action**: 檢視整個前端（`apps/web/src`）。確認這是功能完整但 UI 仍停留在「功能殼層」的 local-first 庫存 PWA。盤點問題：①視覺扁平單調 ②物品列表純文字、無照片，不符照片庫存定位 ③互動薄弱（無 FAB、篩選擠成一欄、提醒純文字）④7 個檔案硬編碼 `local-demo-household` / `local-demo-user` / `local-demo-device` ⑤技術限制：照片只把 `blob:` objectUrl 字串存進 IndexedDB，重新整理後縮圖失效（網格檢視需改存實際 Blob）。與使用者確認方向：直接在程式碼以 Tailwind 重做 UI，範圍涵蓋視覺翻新＋照片網格＋功能體驗＋移除 demo 硬編碼。已將完整實作計畫寫入 `~/.claude/plans/synchronous-meandering-riddle.md`。
+- **Verification**: 規劃階段，未改動程式碼。`DesignSync`（Claude Design 同步工具）需 `/design-login` 授權，但使用者選擇直接改程式碼，故不需要。
+- **Current Blockers**: 等待使用者核准計畫後開始實作。
+- **Next Best Action**: 核准後按計畫實作；建議實作後每階段跑 `npm run typecheck`、`npm run lint`、`npm test`，並以 `npm run dev` 手動驗證（重點：重新整理後縮圖仍在、多家庭資料隔離）。
+
+### 2026-06-25 UI Interaction Polish
+
+- **Completed Action**: Updated the add-item category quick-add toggle so the `+` icon changes to an `X` while the add-category input is expanded. Added client-side internal navigation handling that shows a default gray shimmer skeleton during route changes, then eases in the loaded page content. Added reveal easing for the inline add-category row and subtle hover/press transitions for clickable item, search, and location rows.
+- **Verification**: `npm run typecheck`, `npm run lint`, `npm test`, `npm run build`, and `git diff --check` passed locally. Browser verification confirmed clicking category `+` changes the control to `取消新增分類`, displays the input, and internal navigation from the bottom nav shows `aria-label="頁面載入中"` skeleton placeholders before rendering the target page.
+- **Current Blockers**: none for local interaction behavior.
+- **Next Best Action**: Review the motion timing visually in the browser and tune durations if the experience feels too fast or too slow on target devices.
+
+### 2026-06-25 Option UX Conflict Cleanup
+
+- **Completed Action**: Analyzed the overlap between location-page inline location-type creation and settings-page location-type management. Removed the duplicate inline location-type creation from the location form, leaving settings as the single management surface while keeping a location-form hint. Added protection against removing a custom location type that is still used by existing locations. Changed the add-item category picker so the category select has a right-side `+` button; the add-category input appears only after clicking `+`, collapses after adding, selects the added category, and returns focus to the category select.
+- **Verification**: `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build` passed locally. Browser verification confirmed `/add` category quick-add collapse/focus behavior, `/locations` no longer has inline location-type creation, and `/settings` retains category/location-type management.
+- **Current Blockers**: none for local UX behavior. Managed option sync across devices remains a future cloud-sync slice.
+- **Next Best Action**: Review `/add`, `/locations`, and `/settings` visually, then decide whether settings-managed options should be synchronized as first-class cloud entities.
+
+### 2026-06-25 Managed Category and Location Type Options
+
+- **Completed Action**: Reworked item categories and location types from hard-coded/manual-entry behavior into household-scoped managed options stored in IndexedDB settings. Added category picker with quick-add on the add-item flow and a settings panel for managing item categories and location types. Location `type` now accepts custom string values while preserving default labels for room, cabinet, drawer, hook, box, and other.
+- **Verification**: `npm run typecheck`, `npm run lint`, `npm test`, `npm run build`, and `git diff --check` passed locally. Added option repository coverage for adding/removing custom categories and custom location types.
+- **Current Blockers**: none for local managed options. Cloud sync schema already stores location type/category as text, but Supabase end-to-end sync should still be rechecked after env setup.
+- **Next Best Action**: Manually review `/add`, `/locations`, and `/settings` in the browser, then decide whether managed options should sync across households/devices through explicit SyncOps in the next feature slice.
+
+### 2026-06-24 Traditional Chinese UI Localization
+
+- **Completed Action**: Localized the visible web app UI to Traditional Chinese across the app shell, bottom navigation, PWA manifest, offline fallback page, home, add item, photo privacy, tag picker, locations, search filters/results, item detail/history, move dialog, storage, sync, backup/restore, household settings, member management, permission notices, and user-facing validation/error messages. Added centralized display labels for location types, item statuses, roles, member statuses, sync statuses, and history actions.
+- **Verification**: `npm run typecheck`, `npm run lint`, `npm test`, `npm run build`, and `git diff --check` passed locally. Updated affected tests to assert the new Traditional Chinese UI and error messages.
+- **Current Blockers**: none for UI localization. Some technical identifiers such as `Supabase`, `PWA`, `JSON`, `CSV`, and internal IDs remain intentionally visible where they represent platform names, file formats, or configuration values.
+- **Next Best Action**: Review the running app at `http://localhost:5173/`, then decide whether to add a formal i18n framework before supporting additional languages.
+
+### 2026-06-24 Local Startup and Usage Check
+
+- **Completed Action**: Installed npm dependencies in the workspace, confirmed the code-level MVP can be verified locally, and started the Vite development server for manual review.
+- **Verification**: `npm install` completed with 0 reported vulnerabilities. `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build` passed locally. `npm run dev` required elevated local listen permission after sandboxed startup failed with `listen EPERM: operation not permitted 0.0.0.0:5173`; the approved run started Vite at `http://localhost:5173/`.
+- **Current Blockers**: none for local app startup. Supabase cloud sync requires real `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` environment configuration before validating hosted auth/sync behavior.
+- **Next Best Action**: Manually walk through local add/search/location/backup flows in the browser, then configure Supabase env and run cloud sync/authorization smoke validation if production-like review is needed.
 
 ### 2026-06-23 Phase 10-12 Photo Privacy, Backup, and Verification
 

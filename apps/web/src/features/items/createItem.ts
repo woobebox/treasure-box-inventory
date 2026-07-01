@@ -10,6 +10,9 @@ export interface CreateItemInput extends Omit<ItemDraft, 'id' | 'coverPhotoId' |
   deviceId: string;
   tagNames: string[];
   photo?: Omit<PhotoDraft, 'id' | 'householdId' | 'itemId' | 'createdAt' | 'updatedAt'>;
+  // Device-local thumbnail Blob, persisted to photoBlobs so the cover survives a
+  // reload. Never enters the syncOp payload (sync carries metadata only).
+  thumbnailBlob?: Blob;
 }
 
 export interface CreateItemResult { itemId: string; photo?: Photo; tags: Tag[]; history: HistoryEntry; syncOp: SyncOp; }
@@ -27,11 +30,12 @@ export async function createItem(input: CreateItemInput): Promise<CreateItemResu
     fromLocationId: null, toLocationId: input.currentLocationId, changedFields: { name: item.name, category: item.category, tagNames: input.tagNames, hasPhoto: Boolean(photo) },
     deviceId: input.deviceId, occurredAt: timestamp
   };
-  const syncOp = buildSyncOp({ householdId: input.householdId, actorId: input.createdBy, deviceId: input.deviceId, opType: 'create', entityType: 'item', entityId: itemId, baseVersion: null, payload: { item, photo, tagNames: input.tagNames, history } });
+  const syncOp = buildSyncOp({ householdId: input.householdId, actorId: input.createdBy, deviceId: input.deviceId, opType: 'item.create', entityType: 'items', entityId: itemId, baseVersion: null, payload: { item, photo, tagNames: input.tagNames, history } });
 
-  return db.transaction('rw', [db.items, db.photos, db.tags, db.itemTags, db.history, db.syncOps], async () => {
+  return db.transaction('rw', [db.items, db.photos, db.tags, db.itemTags, db.history, db.syncOps, db.photoBlobs], async () => {
     await db.items.put(item);
     if (photo) await db.photos.put(photo);
+    if (photo && input.thumbnailBlob) await db.photoBlobs.put({ photoId: photo.id, thumbnail: input.thumbnailBlob });
     const tags = [] as Tag[];
     for (const tagName of input.tagNames) tags.push(await findOrCreateTag(input.householdId, tagName));
     await replaceItemTags(input.householdId, itemId, tags.map((tag) => tag.id));

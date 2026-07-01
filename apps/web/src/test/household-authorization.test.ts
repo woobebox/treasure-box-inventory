@@ -9,7 +9,7 @@ describe('household authorization', () => {
     expect(canDeleteOrRestore({ ...base, role: 'admin' })).toBe(true);
   });
   it('rejects inactive or insufficient roles', () => {
-    expect(() => requireRole(base, ['admin'])).toThrow(/permission/);
+    expect(() => requireRole(base, ['admin'])).toThrow(/權限/);
     expect(requireRole({ ...base, role: 'admin' }, ['admin']).role).toBe('admin');
   });
 });

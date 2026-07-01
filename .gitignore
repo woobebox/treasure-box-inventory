@@ -9,3 +9,6 @@ coverage/
 Thumbs.db
 *.tmp
 *.swp
+
+# Supabase CLI local link state (contains project ref; not for version control)
+supabase/.temp/

@@ -5,7 +5,7 @@ import { collectDescendantLocationIds } from '../locations/locationTree';
 import { indexItemText, textMatches } from './searchIndex';
 import type { Item, ItemStatus, Location, Tag } from '../../domain/types';
 
-export interface SearchFilters { query?: string; category?: string; tagIds?: string[]; locationId?: string; includeDescendants?: boolean; status?: ItemStatus | 'all'; dueFrom?: string; dueTo?: string; }
+export interface SearchFilters { query?: string; category?: string; tagIds?: string[]; locationId?: string; includeDescendants?: boolean; status?: ItemStatus | 'all'; createdFrom?: string; createdTo?: string; }
 export interface SearchResult { item: Item; location?: Location; tags: Tag[]; }
 
 export async function searchItems(householdId: string, filters: SearchFilters = {}): Promise<SearchResult[]> {
@@ -22,8 +22,9 @@ export async function searchItems(householdId: string, filters: SearchFilters = 
     if (filters.status && filters.status !== 'all' && item.status !== filters.status) return false;
     if (filters.locationId && !allowedLocationIds?.has(item.currentLocationId)) return false;
     if (filters.tagIds?.length && !filters.tagIds.every((id) => itemTagIds.has(id))) return false;
-    if (filters.dueFrom && (!item.dueAt || item.dueAt < filters.dueFrom)) return false;
-    if (filters.dueTo && (!item.dueAt || item.dueAt > filters.dueTo)) return false;
+    const createdDate = item.createdAt.slice(0, 10);
+    if (filters.createdFrom && createdDate < filters.createdFrom) return false;
+    if (filters.createdTo && createdDate > filters.createdTo) return false;
     return textMatches(indexItemText(item, itemTagsForIndex, locationById.get(item.currentLocationId)), filters.query ?? '');
   }).map((item) => ({ item, location: locationById.get(item.currentLocationId), tags: [...(tagIdsByItem.get(item.id) ?? [])].map((id) => tagById.get(id)).filter((tag): tag is Tag => Boolean(tag)) }));
 }

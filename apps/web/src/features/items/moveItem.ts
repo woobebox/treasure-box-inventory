@@ -12,14 +12,14 @@ export interface MoveItemResult { item: Item; historyEntry: HistoryEntry; syncOp
 
 export async function moveItem(input: MoveItemInput): Promise<MoveItemResult> {
   const item = await getItemById(input.householdId, input.itemId);
-  if (!item) throw new Error('Item not found');
+  if (!item) throw new Error('找不到物品');
   const destination = await getLocationById(input.householdId, input.toLocationId);
-  if (!destination) throw new Error('Destination location not found');
+  if (!destination) throw new Error('找不到目的位置');
   const timestamp = nowIso();
   const previousLocationId = item.currentLocationId;
   const updated: Item = { ...item, currentLocationId: input.toLocationId, updatedBy: input.actorId, updatedAt: timestamp, version: (item.version ?? 0) + 1 };
   const historyEntry = buildHistoryEntry({ householdId: input.householdId, itemId: item.id, actorId: input.actorId, action: HISTORY_ACTIONS.ITEM_MOVED, fromLocationId: previousLocationId, toLocationId: input.toLocationId, changedFields: { currentLocationId: { from: previousLocationId, to: input.toLocationId } }, deviceId: input.deviceId, occurredAt: timestamp });
-  const syncOp = buildSyncOp({ householdId: input.householdId, actorId: input.actorId, deviceId: input.deviceId, opType: 'update', entityType: 'item', entityId: item.id, baseVersion: item.version ?? null, payload: { item: updated, historyEntry } });
+  const syncOp = buildSyncOp({ householdId: input.householdId, actorId: input.actorId, deviceId: input.deviceId, opType: 'item.move', entityType: 'items', entityId: item.id, baseVersion: item.version ?? null, payload: { item: updated, historyEntry } });
   await writeLocalChange([db.items, db.history, db.syncOps], async () => { await db.items.put(updated); await db.history.put(historyEntry); await db.syncOps.put(syncOp); });
   return { item: updated, historyEntry, syncOp };
 }

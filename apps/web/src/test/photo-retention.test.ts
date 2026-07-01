@@ -14,6 +14,6 @@ describe('photo retention policy', () => {
   });
 
   it('rejects retained originals', () => {
-    expect(() => assertNoOriginalRetained({ originalRetained: true, exifStripped: true })).toThrow(/Original photos/);
+    expect(() => assertNoOriginalRetained({ originalRetained: true, exifStripped: true })).toThrow(/原始照片/);
   });
 });

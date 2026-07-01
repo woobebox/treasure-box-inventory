@@ -1,42 +1,47 @@
 import { type FormEvent, useState } from 'react';
+import { CategoryPicker } from '../categories/CategoryPicker';
 import { LocationPicker } from '../locations/LocationPicker';
 import { TagPicker } from '../tags/TagPicker';
 import { PhotoInput } from './PhotoInput';
 import { createItem } from './createItem';
-import { useItemForm } from './useItemForm';
+import { useItemForm, emptyItemForm } from './useItemForm';
+import { useHousehold } from '../../services/householdContextValue';
+import { useToast } from '../../components/toast/toastContext';
 
-const demoHouseholdId = 'local-demo-household';
-const demoUserId = 'local-demo-user';
-const demoDeviceId = 'local-demo-device';
+const requiredMark = <span className="text-rose-500"> *</span>;
 
 export function AddItemPage() {
-  const { state, setState, errors, isValid } = useItemForm();
-  const [message, setMessage] = useState('');
+  const { householdId, userId, deviceId } = useHousehold();
+  const { state, setState, visibleErrors, isValid, setSubmitted } = useItemForm();
+  const { show } = useToast();
+  const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setSubmitted(true);
     if (!isValid) return;
     setSaving(true);
-    setMessage('');
+    setError('');
     try {
-      const result = await createItem({
-        householdId: demoHouseholdId,
-        createdBy: demoUserId,
-        updatedBy: demoUserId,
-        deviceId: demoDeviceId,
+      await createItem({
+        householdId,
+        createdBy: userId,
+        updatedBy: userId,
+        deviceId,
         name: state.name,
         category: state.category,
         currentLocationId: state.locationId,
         notes: state.notes,
-        dueAt: state.dueAt || null,
         tagNames: state.tagNames,
-        photo: state.photo?.metadata
+        photo: state.photo?.metadata,
+        thumbnailBlob: state.photo?.thumbnail.blob
       });
-      setMessage(`已離線儲存物品，待同步作業 ${result.syncOp.id.slice(0, 8)} 已建立。`);
-      setState({ name: '', category: '', locationId: '', notes: '', dueAt: '', tagNames: [], photo: undefined });
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : '儲存失敗');
+      show('已新增物品');
+      setState(emptyItemForm);
+      setSubmitted(false);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : '儲存失敗');
     } finally {
       setSaving(false);
     }
@@ -45,31 +50,26 @@ export function AddItemPage() {
   return (
     <form onSubmit={submit} className="space-y-4">
       <div>
-        <label className="text-sm font-medium text-slate-700" htmlFor="item-name">Name</label>
+        <label className="text-sm font-medium text-slate-700" htmlFor="item-name">物品名稱{requiredMark}</label>
         <input id="item-name" value={state.name} onChange={(event) => setState({ ...state, name: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2" />
-        {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
+        {visibleErrors.name && <p className="mt-1 text-xs text-rose-600">{visibleErrors.name}</p>}
       </div>
       <div>
-        <label className="text-sm font-medium text-slate-700" htmlFor="item-category">Category</label>
-        <input id="item-category" value={state.category} onChange={(event) => setState({ ...state, category: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2" />
-        {errors.category && <p className="mt-1 text-xs text-red-600">{errors.category}</p>}
+        <CategoryPicker householdId={householdId} value={state.category} onChange={(category) => setState({ ...state, category })} required />
+        {visibleErrors.category && <p className="mt-1 text-xs text-rose-600">{visibleErrors.category}</p>}
       </div>
       <div>
-        <LocationPicker householdId={demoHouseholdId} value={state.locationId} onChange={(locationId) => setState({ ...state, locationId })} />
-        {errors.locationId && <p className="mt-1 text-xs text-red-600">{errors.locationId}</p>}
+        <LocationPicker householdId={householdId} value={state.locationId} onChange={(locationId) => setState({ ...state, locationId })} required />
+        {visibleErrors.locationId && <p className="mt-1 text-xs text-rose-600">{visibleErrors.locationId}</p>}
       </div>
       <div>
-        <label className="text-sm font-medium text-slate-700" htmlFor="item-notes">Notes</label>
+        <label className="text-sm font-medium text-slate-700" htmlFor="item-notes">備註</label>
         <textarea id="item-notes" value={state.notes} onChange={(event) => setState({ ...state, notes: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2" rows={3} />
-      </div>
-      <div>
-        <label className="text-sm font-medium text-slate-700" htmlFor="item-due">Due date</label>
-        <input id="item-due" type="date" value={state.dueAt} onChange={(event) => setState({ ...state, dueAt: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2" />
       </div>
       <PhotoInput value={state.photo} onChange={(photo) => setState({ ...state, photo })} />
       <TagPicker selected={state.tagNames} onChange={(tagNames) => setState({ ...state, tagNames })} />
-      <button disabled={!isValid || saving} className="w-full rounded-2xl bg-teal-700 px-4 py-3 font-semibold text-white disabled:bg-slate-300">{saving ? 'Saving locally...' : 'Save offline'}</button>
-      {message && <p className="rounded-2xl bg-slate-100 p-3 text-sm text-slate-700">{message}</p>}
+      <button disabled={saving} className="w-full rounded-2xl bg-teal-700 px-4 py-3 font-semibold text-white disabled:bg-slate-300">{saving ? '正在儲存到本機...' : '離線儲存'}</button>
+      {error && <p className="rounded-2xl bg-rose-50 p-3 text-sm text-rose-700">{error}</p>}
     </form>
   );
 }

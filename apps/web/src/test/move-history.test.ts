@@ -16,7 +16,7 @@ describe('offline item move history', () => {
     expect(result.item.currentLocationId).toBe(box.id);
     const history = await listItemHistory('household-1', created.itemId);
     expect(history.some((entry) => entry.action === HISTORY_ACTIONS.ITEM_MOVED && entry.fromLocationId === shelf.id && entry.toLocationId === box.id)).toBe(true);
-    const pending = await db.syncOps.where('entityId').equals(created.itemId).filter((op) => op.status === 'pending' && op.opType === 'update').toArray();
+    const pending = await db.syncOps.where('entityId').equals(created.itemId).filter((op) => op.status === 'pending' && op.opType === 'item.move').toArray();
     expect(pending).toHaveLength(1);
   });
 });

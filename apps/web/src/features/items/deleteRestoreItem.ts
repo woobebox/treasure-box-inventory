@@ -1,20 +1,45 @@
 import Dexie from 'dexie';
 import { db } from '../../db/database';
-import type { HouseholdMember } from '../../domain/types';
+import type { HouseholdMember, Item } from '../../domain/types';
 import { nowIso } from '../../domain/utils';
 import { isWithinSoftDeleteRetention } from '../../domain/retention';
 import { canDeleteOrRestore } from '../../services/authorization';
+import { buildHistoryEntry, HISTORY_ACTIONS } from '../../db/historyRepository';
+import { buildSyncOp } from '../../sync/syncOpFactory';
 
-export async function softDeleteItem(itemId: string, member?: HouseholdMember): Promise<void> {
-  if (!canDeleteOrRestore(member)) throw new Error('Only household admins can delete items.');
-  await db.items.update(itemId, { status: 'deleted', deletedAt: nowIso(), updatedAt: nowIso() });
+export interface DeleteRestoreInput { householdId: string; itemId: string; actorId: string; deviceId: string; member?: HouseholdMember; }
+
+export async function softDeleteItem(input: DeleteRestoreInput): Promise<Item> {
+  if (!canDeleteOrRestore(input.member)) throw new Error('只有家庭管理者可以刪除物品。');
+  const item = await db.items.get(input.itemId);
+  if (!item || item.householdId !== input.householdId) throw new Error('找不到物品');
+  const timestamp = nowIso();
+  const updated: Item = { ...item, status: 'deleted', deletedAt: timestamp, updatedBy: input.actorId, updatedAt: timestamp, version: (item.version ?? 0) + 1 };
+  const history = buildHistoryEntry({ householdId: input.householdId, itemId: item.id, actorId: input.actorId, action: HISTORY_ACTIONS.ITEM_DELETED, changedFields: { status: { from: item.status, to: 'deleted' } }, deviceId: input.deviceId });
+  const syncOp = buildSyncOp({ householdId: input.householdId, actorId: input.actorId, deviceId: input.deviceId, opType: 'item.delete', entityType: 'items', entityId: item.id, baseVersion: item.version ?? null, payload: { item: updated, historyEntry: history } });
+  await db.transaction('rw', [db.items, db.history, db.syncOps], async () => {
+    await db.items.put(updated);
+    await db.history.put(history);
+    await db.syncOps.put(syncOp);
+  });
+  return updated;
 }
 
-export async function restoreItem(itemId: string, member?: HouseholdMember): Promise<void> {
-  if (!canDeleteOrRestore(member)) throw new Error('Only household admins can restore items.');
-  const item = await db.items.get(itemId);
-  if (!item?.deletedAt || !isWithinSoftDeleteRetention(item.deletedAt)) throw new Error('Item is outside the 30-day restore window.');
-  await db.items.update(itemId, { status: 'active', deletedAt: null, updatedAt: nowIso() });
+export async function restoreItem(input: DeleteRestoreInput): Promise<Item> {
+  if (!canDeleteOrRestore(input.member)) throw new Error('只有家庭管理者可以還原物品。');
+  const item = await db.items.get(input.itemId);
+  if (!item || item.householdId !== input.householdId) throw new Error('找不到物品');
+  if (!item.deletedAt || !isWithinSoftDeleteRetention(item.deletedAt)) throw new Error('物品已超過 30 天還原期限。');
+  const timestamp = nowIso();
+  const updated: Item = { ...item, status: 'active', deletedAt: null, updatedBy: input.actorId, updatedAt: timestamp, version: (item.version ?? 0) + 1 };
+  const history = buildHistoryEntry({ householdId: input.householdId, itemId: item.id, actorId: input.actorId, action: HISTORY_ACTIONS.ITEM_RESTORED, changedFields: { status: { from: 'deleted', to: 'active' } }, deviceId: input.deviceId });
+  const syncOp = buildSyncOp({ householdId: input.householdId, actorId: input.actorId, deviceId: input.deviceId, opType: 'item.restore', entityType: 'items', entityId: item.id, baseVersion: item.version ?? null, payload: { item: updated, historyEntry: history } });
+  await db.transaction('rw', [db.items, db.history, db.syncOps], async () => {
+    await db.items.put(updated);
+    await db.history.put(history);
+    await db.syncOps.put(syncOp);
+  });
+  return updated;
 }
 
 export async function cleanupExpiredSoftDeletedItems(householdId: string, now: Date = new Date()): Promise<number> {
