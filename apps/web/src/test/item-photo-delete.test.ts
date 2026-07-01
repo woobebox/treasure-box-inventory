@@ -43,6 +43,10 @@ describe('photo management', () => {
     const item = await db.items.get(itemId);
     expect(item?.coverPhotoId).toBe(second.id);
     expect(await db.photoBlobs.get(first.id)).toBeUndefined();
+    const removed = await db.photos.get(first.id);
+    expect(removed?.version).toBe(2);
+    const removeOp = await db.syncOps.where('entityId').equals(first.id).filter((op) => op.opType === 'photo.remove').first();
+    expect(removeOp?.baseVersion).toBe(1);
   });
 });
 

@@ -13,9 +13,9 @@ export async function removePhoto(input: RemovePhotoInput): Promise<void> {
   if (!photo || photo.householdId !== input.householdId) throw new Error('找不到照片');
   const item = await db.items.get(input.itemId);
   const timestamp = nowIso();
-  const removed = { ...photo, deletedAt: timestamp, updatedAt: timestamp };
+  const removed = { ...photo, deletedAt: timestamp, updatedAt: timestamp, version: (photo.version ?? 0) + 1 };
   const history = buildHistoryEntry({ householdId: input.householdId, itemId: input.itemId, actorId: input.actorId, action: HISTORY_ACTIONS.PHOTO_REMOVED, changedFields: { photoId: input.photoId }, deviceId: input.deviceId });
-  const syncOp = buildSyncOp({ householdId: input.householdId, actorId: input.actorId, deviceId: input.deviceId, opType: 'photo.remove', entityType: 'photos', entityId: input.photoId, baseVersion: null, payload: { photoId: input.photoId, photo: removed, historyEntry: history } });
+  const syncOp = buildSyncOp({ householdId: input.householdId, actorId: input.actorId, deviceId: input.deviceId, opType: 'photo.remove', entityType: 'photos', entityId: input.photoId, baseVersion: photo.version ?? null, payload: { photoId: input.photoId, photo: removed, historyEntry: history } });
 
   await db.transaction('rw', [db.items, db.photos, db.photoBlobs, db.history, db.syncOps], async () => {
     await db.photos.put(removed);

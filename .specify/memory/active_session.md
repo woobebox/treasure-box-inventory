@@ -1,9 +1,9 @@
 # Current Session Progress
 
 - **Current Active Feature**: `001-local-first-pwa-inventory`
-- **Latest Verified Action**: 2026-07-01 — GitHub Pages 部署就緒（連雲端同步版、push main 自動部署）：vite base 設 `/treasure-box-inventory/`、新增 basePath 助手改造手寫路由與所有內部連結、manifest/SW/appShell 快取改 base-aware、新增 `deploy-pages.yml`（純 git 推 gh-pages、含 404.html/.nojekyll）與部署文件。`typecheck`/`lint`/`test`(16/34)/`build` 全綠；`npm run preview` 於子路徑驗證首頁/JS/CSS/manifest 皆 200。
-- **Current Blockers**: 待使用者手動一次：repo 加 `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` secrets；首次部署後 Settings→Pages 設 Deploy from branch=gh-pages。程式面無 blocker。
-- **Next Best Action**: 使用者加 secrets → push main（或手動 Run workflow）→ 啟用 Pages → 開 https://woobebox.github.io/treasure-box-inventory/ 驗收（載入、登入、同步、深層連結重整不 404）。後續可選：照片跨裝置、選項同步。
+- **Latest Verified Action**: 2026-07-01 — 修正 GitHub Pages 實測問題：首頁最近物品現在會把 `currentLocationId` 解析為位置 `path`；同步摘要納入失敗筆數；新增並已套用 Supabase migration `007_photos_version.sql`，補齊 `photos.version`，排除 PostgREST schema cache 的 version column 錯誤；照片移除同步改用 version/baseVersion 樂觀鎖。
+- **Current Blockers**: 程式與 Supabase migration 均無 blocker；修正已提交為 `c38dcf6`，但此環境缺少 GitHub HTTPS credentials，`git push origin main` 失敗，GitHub Pages 尚未包含前端修正。
+- **Next Best Action**: 在已登入 GitHub 的環境執行 `git push origin main` 觸發 Pages 部署；之後線上驗收首頁位置顯示並再次按「立即同步」重試先前失敗的 outbox op。
 
 ## Session Memory Routine（依使用者要求 2026-06-29）
 
@@ -12,6 +12,13 @@
 - 本檔即為跨 session 記憶來源；`AGENTS.md` 規則 1 與 5 已涵蓋此流程。
 
 ## Session Log
+
+### 2026-07-01 首頁位置顯示與 photos.version 同步修復
+
+- **Completed Action**: `HomePage.tsx` 補載家庭位置並以 `currentLocationId` 對照 `location.path` 傳給 `ItemCard`，修正最近物品誤顯示「未設定位置」；待同步計數改涵蓋所有尚未 synced 的 op。`SyncSettings.tsx` 將 failed 納入錯誤狀態與摘要。新增 `007_photos_version.sql`，補上雲端 `photos.version integer not null default 1`，並已執行 `supabase db push` 套用遠端；`removePhoto.ts` 同步提升 photo version 並帶 baseVersion。
+- **Verification**: 使用 Codex bundled Node 直接執行 `tsc -b --pretty false`、`eslint .`、`vitest run`（17 files / 35 tests passed）、`tsc -b && vite build`、`git diff --check`，全部通過；新增首頁位置回歸測試與照片移除 version/baseVersion 斷言。`supabase migration list` 確認遠端原先缺 007，`supabase db push` 成功套用。
+- **Current Blockers**: 已建立 commit `c38dcf6`，但 `git push origin main` 因目前環境無 GitHub HTTPS credentials 而失敗；本地 main 為 ahead 1。
+- **Next Best Action**: 在已登入 GitHub 的終端執行 `git push origin main`，等待 Pages workflow 完成後實機重試同步。
 
 ### 2026-07-01 GitHub Pages 部署（base path + gh-pages workflow）
 

@@ -18,8 +18,8 @@ export function SyncSettings() {
       const pushed = await pushOutbox(householdId, deviceId);
       const pulled = await pullChanges(householdId, deviceId);
       setReasons(pushed.reasons ?? []);
-      setState(pushed.conflicted > 0 ? 'error' : 'success');
-      setMessage(`已推送 ${pushed.synced} 筆，衝突 ${pushed.conflicted} 筆，拉取 ${pulled.applied} 筆。`);
+      setState(pushed.conflicted > 0 || pushed.failed > 0 ? 'error' : 'success');
+      setMessage(`已推送 ${pushed.synced} 筆，失敗 ${pushed.failed} 筆，衝突 ${pushed.conflicted} 筆，拉取 ${pulled.applied} 筆。`);
     } catch (error) {
       setState('error');
       setMessage(error instanceof Error ? error.message : '同步失敗。');
