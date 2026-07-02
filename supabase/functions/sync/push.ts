@@ -66,11 +66,17 @@ async function applyOp(supabase: SupabaseClient, householdId: string, op: PushOp
       return Number((item as { version?: number }).version ?? 1);
     }
     case 'location.create':
-    case 'location.update': {
+    case 'location.update':
+    case 'location.delete': {
       const location = payload.location as Record<string, unknown> | undefined;
       if (!location) throw new Error('missing_location_payload');
       const { error } = await supabase.from('locations').upsert(camelToRow(location));
       if (error) throw new Error(error.message);
+      if (op.op_type === 'location.delete' && Array.isArray(payload.clearedItemIds)) {
+        for (const itemId of payload.clearedItemIds as string[]) {
+          await supabase.from('items').update({ current_location_id: null, updated_at: new Date().toISOString() }).eq('id', itemId);
+        }
+      }
       return Number((location as { version?: number }).version ?? 1);
     }
     case 'photo.add':
