@@ -7,6 +7,7 @@ import { SyncSettings } from '../features/settings/SyncSettings';
 import { OptionSettings } from '../features/settings/OptionSettings';
 import { HouseholdSettingsPage } from '../features/households/HouseholdSettingsPage';
 import { BackupSettings } from '../features/settings/BackupSettings';
+import { TrashSettings } from '../features/settings/TrashSettings';
 import { LocationsPage } from '../features/locations/LocationsPage';
 import { SearchPage } from '../features/search/SearchPage';
 import { bottomNavRoutes } from './routes';
@@ -105,7 +106,7 @@ function AppShell() {
               ) : path === '/search' ? (
                 <SearchPage />
               ) : path === '/settings' ? (
-                <div className="space-y-6"><StorageSettings /><OptionSettings /><SyncSettings /><BackupSettings /><HouseholdSettingsPage /></div>
+                <div className="space-y-6"><StorageSettings /><OptionSettings /><SyncSettings /><BackupSettings /><TrashSettings /><HouseholdSettingsPage /></div>
               ) : path.startsWith('/items/') ? (
                 <ItemDetailPage itemId={decodeURIComponent(path.split('/').pop() ?? '')} />
               ) : (

@@ -64,6 +64,11 @@ export async function listItemsByHousehold(householdId: string): Promise<Item[]>
   return db.items.where('householdId').equals(householdId).filter((item) => !item.deletedAt).toArray();
 }
 
+export async function listDeletedItemsByHousehold(householdId: string): Promise<Item[]> {
+  if (!householdId) throw new Error('缺少家庭識別碼');
+  return db.items.where('householdId').equals(householdId).filter((item) => !!item.deletedAt).sortBy('deletedAt');
+}
+
 export async function updateItem(item: Item, patch: Partial<Omit<Item, 'id' | 'householdId' | 'createdAt'>>): Promise<Item> {
   const updated: Item = { ...item, ...patch, updatedAt: nowIso(), version: (item.version ?? 0) + 1 };
   if (patch.name) updated.normalizedName = normalizeText(patch.name);
