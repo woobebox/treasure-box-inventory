@@ -8,6 +8,7 @@ import { OptionSettings } from '../features/settings/OptionSettings';
 import { HouseholdSettingsPage } from '../features/households/HouseholdSettingsPage';
 import { BackupSettings } from '../features/settings/BackupSettings';
 import { TrashSettings } from '../features/settings/TrashSettings';
+import { TrashPage } from '../features/settings/TrashPage';
 import { LocationsPage } from '../features/locations/LocationsPage';
 import { SearchPage } from '../features/search/SearchPage';
 import { bottomNavRoutes } from './routes';
@@ -23,7 +24,8 @@ const pageCopy: Record<string, { title: string; description: string }> = {
   '/locations': { title: '位置管理', description: '管理房間、櫃位、抽屜、掛勾與箱子。' },
   '/add': { title: '新增物品', description: '拍攝或上傳照片，先安全儲存在本機。' },
   '/search': { title: '搜尋物品', description: '依名稱、標籤、分類、位置、日期或狀態找回物品。' },
-  '/settings': { title: '系統設定', description: '管理同步、儲存空間、備份、家庭與安裝狀態。' }
+  '/settings': { title: '系統設定', description: '管理同步、儲存空間、備份、家庭與安裝狀態。' },
+  '/trash': { title: '已刪除物品', description: '30 天內可還原，逾期永久移除。' }
 };
 
 // Gate: when Supabase is configured, require a signed-in user and a selected
@@ -107,6 +109,8 @@ function AppShell() {
                 <SearchPage />
               ) : path === '/settings' ? (
                 <div className="space-y-6"><StorageSettings /><OptionSettings /><SyncSettings /><BackupSettings /><TrashSettings /><HouseholdSettingsPage /></div>
+              ) : path === '/trash' ? (
+                <TrashPage />
               ) : path.startsWith('/items/') ? (
                 <ItemDetailPage itemId={decodeURIComponent(path.split('/').pop() ?? '')} />
               ) : (

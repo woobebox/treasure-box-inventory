@@ -1,7 +1,7 @@
 import { Archive, Home, Map, PlusCircle, Search, Settings } from 'lucide-react';
 import type { ComponentType } from 'react';
 
-export type AppRouteId = 'home' | 'locations' | 'add' | 'search' | 'settings' | 'item-detail';
+export type AppRouteId = 'home' | 'locations' | 'add' | 'search' | 'settings' | 'item-detail' | 'trash';
 
 export interface AppRoute {
   id: AppRouteId;
@@ -17,7 +17,8 @@ export const appRoutes: AppRoute[] = [
   { id: 'add', path: '/add', label: '新增', icon: PlusCircle, showInBottomNav: true },
   { id: 'search', path: '/search', label: '搜尋', icon: Search, showInBottomNav: true },
   { id: 'settings', path: '/settings', label: '設定', icon: Settings, showInBottomNav: true },
-  { id: 'item-detail', path: '/items/:itemId', label: '物品詳情', icon: Archive, showInBottomNav: false }
+  { id: 'item-detail', path: '/items/:itemId', label: '物品詳情', icon: Archive, showInBottomNav: false },
+  { id: 'trash', path: '/trash', label: '已刪除物品', icon: Archive, showInBottomNav: false },
 ];
 
 export const bottomNavRoutes = appRoutes.filter((route) => route.showInBottomNav);
