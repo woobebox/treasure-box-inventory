@@ -1,9 +1,9 @@
 # Current Session Progress
 
 - **Current Active Feature**: `001-local-first-pwa-inventory`
-- **Latest Verified Action**: 2026-07-01 — 修正位置管理新增後「上層位置」下拉未即時刷新；新增物品頁的位置欄位加入與分類一致的 `+ / ×` 快速新增，支援名稱、類型、上層位置，建立後自動選取並寫入同步 outbox。
-- **Current Blockers**: 程式面無 blocker；本次變更尚未 commit/push，GitHub Pages 尚未包含位置互動修正。
-- **Next Best Action**: review 後 commit + push main 觸發 Pages，部署後以手機點測快速新增位置的兩欄選單與觸控尺寸。
+- **Latest Verified Action**: 2026-07-14 — 完成手機 UX / UI / 新功能全面分析（僅分析未改碼），盤點出同步純手動埋設定頁、路由人為 220ms 延遲、無位置內容瀏覽動線、照片非新增主角、無返回鍵等重點缺口。
+- **Current Blockers**: `apps/web/src/features/households/MemberManagement.tsx` 有一筆未 commit 的既有修改（非本次產生），來源 session 未記錄。
+- **Next Best Action**: 與使用者確認優化優先順序後，以 Spec Kit 流程（specify → plan → tasks）排入實作；建議首批：自動同步、移除路由假延遲、位置詳情瀏覽動線、拍照優先新增流程。
 
 ## Session Memory Routine（依使用者要求 2026-06-29）
 
@@ -12,6 +12,13 @@
 - 本檔即為跨 session 記憶來源；`AGENTS.md` 規則 1 與 5 已涵蓋此流程。
 
 ## Session Log
+
+### 2026-07-14 手機 UX / UI / 新功能全面分析（未改碼）
+
+- **Completed Action**: 應使用者要求分析系統可再優化之處。讀取 App.tsx、routes、Home/Add/Search/ItemDetail/Locations、PhotoInput、MoveItemDialog、SyncSettings 與 sync 觸發點。主要發現：①同步只能在設定頁手動觸發，無 mutation 後 / online 事件 / 啟動時自動同步；②`App.tsx` 的 `completeNavigation` 對每次路由切換人為加 220ms skeleton 延遲；③位置頁點名稱只能編輯，無「看此位置內物品」的瀏覽動線；④新增物品把照片放第 5 欄且選填，與拍照庫存定位相反，且新增時僅能一張；⑤非頂層頁（物品詳情/回收桶）header 無返回鍵，iOS standalone 有死路風險；⑥觸控目標偏小（刪除鈕 32px、bottom nav py-1）；⑦刪除確認 window.confirm 與自製 modal 並存不一致；⑧搜尋無 debounce、全表掃描；⑨設定頁六區塊同頁堆疊；⑩照片 Blob 仍不跨裝置（既知）。新功能候選：QR 箱子標籤、位置詳情頁、批次移動、數量/借出欄位、manifest shortcuts + share target、深色模式。
+- **Verification**: 純分析，未改程式碼、未跑驗證指令。
+- **Current Blockers**: `MemberManagement.tsx` 有未 commit 既有修改，來源不明，未處理。
+- **Next Best Action**: 使用者選定優先級後走 specify → plan → tasks 排入實作。
 
 ### 2026-07-01 位置即時刷新與新增物品快速新增位置
 
