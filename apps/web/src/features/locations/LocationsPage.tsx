@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Trash2 } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
+import { toHref } from '../../app/basePath';
 import type { Location } from '../../domain/types';
 import { formatLocationType } from '../../domain/labels';
 import { listItemsByHousehold } from '../../db/itemRepository';
@@ -16,12 +17,17 @@ function Node({ node, onEdit, onDelete }: { node: LocationTreeNode; onEdit: (loc
     <li className="interactive-card mt-2 rounded-2xl border border-slate-200 p-3">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <button className="font-semibold text-teal-800 text-left" onClick={() => onEdit(node.location)}>{node.location.name}</button>
+          <a href={toHref(`/locations/${node.location.id}`)} className="font-semibold text-teal-800">{node.location.name}</a>
           <p className="text-xs text-slate-500">{formatLocationType(node.location.type)} · 含子位置共 {node.descendantItemCount} 件物品</p>
         </div>
-        <button type="button" aria-label={`刪除位置「${node.location.name}」`} onClick={() => onDelete(node.location)} className="shrink-0 flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600">
-          <Trash2 className="h-4 w-4" />
-        </button>
+        <div className="flex shrink-0 gap-1">
+          <button type="button" aria-label={`編輯位置「${node.location.name}」`} onClick={() => onEdit(node.location)} className="flex h-10 w-10 items-center justify-center rounded-lg text-slate-400 hover:bg-teal-50 hover:text-teal-700">
+            <Pencil className="h-4 w-4" />
+          </button>
+          <button type="button" aria-label={`刪除位置「${node.location.name}」`} onClick={() => onDelete(node.location)} className="flex h-10 w-10 items-center justify-center rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600">
+            <Trash2 className="h-4 w-4" />
+          </button>
+        </div>
       </div>
       {node.children.length > 0 && (
         <ul className="ml-4 border-l border-slate-200 pl-3">

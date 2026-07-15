@@ -63,22 +63,6 @@ textarea:focus-visible {
   transform: translateY(-1px);
 }
 
-.skeleton-block {
-  position: relative;
-  overflow: hidden;
-  border-radius: 0.875rem;
-  background: #e2e8f0;
-}
-
-.skeleton-block::after {
-  position: absolute;
-  inset: 0;
-  content: "";
-  animation: skeleton-shimmer 1.15s ease-in-out infinite;
-  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.72), transparent);
-  transform: translateX(-100%);
-}
-
 @keyframes page-content-enter {
   from {
     opacity: 0;
@@ -98,12 +82,6 @@ textarea:focus-visible {
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@keyframes skeleton-shimmer {
-  to {
-    transform: translateX(100%);
   }
 }
 

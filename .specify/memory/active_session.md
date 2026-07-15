@@ -1,9 +1,9 @@
 # Current Session Progress
 
-- **Current Active Feature**: `001-local-first-pwa-inventory`
-- **Latest Verified Action**: 2026-07-14 — 完成手機 UX / UI / 新功能全面分析（僅分析未改碼），盤點出同步純手動埋設定頁、路由人為 220ms 延遲、無位置內容瀏覽動線、照片非新增主角、無返回鍵等重點缺口。
-- **Current Blockers**: `apps/web/src/features/households/MemberManagement.tsx` 有一筆未 commit 的既有修改（非本次產生），來源 session 未記錄。
-- **Next Best Action**: 與使用者確認優化優先順序後，以 Spec Kit 流程（specify → plan → tasks）排入實作；建議首批：自動同步、移除路由假延遲、位置詳情瀏覽動線、拍照優先新增流程。
+- **Current Active Feature**: `002-mobile-ux-uplift`（`.specify/feature.json` 已切換）
+- **Latest Verified Action**: 2026-07-15 — 重新驗證 002 全流程（T001–T019 全勾）：自動同步排程器、移除路由 220ms 假延遲、位置詳情頁 `/locations/:id`、非頂層路由返回鍵。`typecheck`/`lint`/`test`（21 files / 54 tests，基準 18/39）/`build` 全綠。
+- **Current Blockers**: `026bf5e` 與 002 的 `5a2a5e9` 已提交但尚未推送；目前終端對 GitHub HTTPS 無認證（`could not read Username`），且未安裝 GitHub CLI。quickstart A–E 手動情境（雙裝置自動同步、實機 standalone 返回鍵）待使用者驗收。
+- **Next Best Action**: 完成 GitHub 認證後 push main 觸發 Pages，部署後依 `.specify/features/002-mobile-ux-uplift/quickstart.md` 以兩台裝置驗收自動同步與位置詳情動線。
 
 ## Session Memory Routine（依使用者要求 2026-06-29）
 
@@ -12,6 +12,27 @@
 - 本檔即為跨 session 記憶來源；`AGENTS.md` 規則 1 與 5 已涵蓋此流程。
 
 ## Session Log
+
+### 2026-07-15 002 手機 UX 優化提交完成、推送待 GitHub 認證
+
+- **Completed Action**: 建立獨立提交 `5a2a5e9 feat: 完成手機 UX 第一批優化`（22 檔，包含 002 功能、Spec Kit 文件、回歸測試與交接）。
+- **Verification**: 提交前 `git diff --cached --check` 通過；推送前重新抓取遠端，確認 `origin/main` 未新增提交。
+- **Current Blockers**: `git push origin main` 失敗：`fatal: could not read Username for 'https://github.com': Device not configured`。`gh` 未安裝，無法檢查或建立 CLI 登入。兩個本機提交均未遺失；目前 main 仍較 origin/main 多 2 個提交。
+- **Next Best Action**: 在已登入 GitHub 的終端完成一次認證後，執行 `git push origin main`；確認 Pages workflow 成功後執行 quickstart A–E 實機驗收。
+
+### 2026-07-15 002 手機 UX 優化交接復核
+
+- **Completed Action**: 依目前工作區、feature 文件與 Git 歷史復核 002 進度；`tasks.md` 為 T001–T019 全勾、需求 checklist 全勾。確認圖片所稱的 `MemberManagement.tsx` 修改已不在未提交區，而是已包含於僅存在本機的 `026bf5e`（main 比 origin/main 多 1 個提交）。
+- **Verification**: 在 `apps/web` 正確工作目錄，以已安裝工具執行 `tsc -b --pretty false`、`eslint .`、`vitest run`（21 files / 54 tests）、`tsc -b && vite build`，皆通過。終端缺少 `npm`，改直接呼叫專案相依工具；此處與 `npm --prefix apps/web run ...` 使用相同設定。Vitest 僅輸出 jsdom 未實作 `window.scrollTo()` 的資訊訊息；build 僅有既存單一 chunk 大於 500 kB 的警告。
+- **Current Blockers**: 002 尚待獨立 commit；commit 後需推送 main（會一併推送 `026bf5e`）觸發 Pages；quickstart A–E 實機驗收未完成。
+- **Next Best Action**: 使用者確認目前 diff 後，建立 002 的獨立 commit、push main、確認 Pages 成功，再依 quickstart 以兩台裝置驗收自動同步與 iOS standalone 返回鍵。
+
+### 2026-07-14 002 手機 UX 優化第一批實作完成（自動同步／即時導覽／位置詳情／返回鍵）
+
+- **Completed Action**: 建立 feature `002-mobile-ux-uplift`（spec/plan/research/data-model/quickstart/tasks，checklist 全過，`feature.json` 與 `.github/copilot-instructions.md` 已指向 002）。實作：①新增 `sync/syncScheduler.ts` 模組單例（寫入去抖動 2.5s 自動推送，choke point 為 `db.syncOps.hook('creating')`；啟動／`visibilitychange`／`online` 自動 push+pull，30s 節流；in-flight 防重入；generation 防跨家庭殘留；pushFn/pullFn 可注入）與 `sync/useSyncStatus.ts`（`useSyncExternalStore` + `useAutoSync` 掛在 AppShell，無 Supabase 或無 household 時 disabled）；`HomePage` 待同步文字改為可點擊同步狀態膠囊（純離線顯示不可點文案），並在同步完成後重載最近物品；`SyncSettings` 改共用 scheduler 狀態。②`App.tsx` 移除 220ms 假延遲與 `RouteSkeleton`（global.css 一併清除 skeleton 樣式），`navigate` 攜帶 query string。③新增 `LocationDetailPage`（`/locations/:id`：類型／路徑／含子位置物品清單、空狀態、找不到位置、「在此位置新增物品」`/add?locationId=` 預選、內嵌 LocationForm 編輯）；`LocationsPage` 節點點名稱進詳情、另設鉛筆編輯鈕；`AddItemPage` 讀 query 預選並驗證位置存在。④header 返回鍵（`inAppNavCount` ref 判斷 `history.back()` 或 fallback：items→首頁、locations→位置、trash→設定），觸控目標 44px。
+- **Verification**: `npm run typecheck`、`lint`（0 警告）、`test`（21 files / 54 tests，全過；新增 sync-scheduler 6 測試、location-detail 5 測試、app-back-navigation 4 測試）、`build` 全綠（僅既存 >500kB 警告）。測試學到：fake timers 下 await fake-indexeddb 會死鎖，需 `vi.useFakeTimers({ shouldAdvanceTime: true })`；App 測試需 mock `services/supabaseClient` 為 null 否則 `.env` 使 App 進登入 gate。
+- **Current Blockers**: 未 commit/push；quickstart A–E 實機情境待使用者驗收。
+- **Next Best Action**: review 後 commit/push main，Pages 部署後雙裝置驗收自動同步、位置詳情、返回鍵（iOS standalone）。
 
 ### 2026-07-14 手機 UX / UI / 新功能全面分析（未改碼）
 

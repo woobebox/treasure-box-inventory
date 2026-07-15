@@ -1,10 +1,11 @@
-import { type FormEvent, useState } from 'react';
+import { type FormEvent, useEffect, useMemo, useState } from 'react';
 import { CategoryPicker } from '../categories/CategoryPicker';
 import { LocationPicker } from '../locations/LocationPicker';
 import { TagPicker } from '../tags/TagPicker';
 import { PhotoInput } from './PhotoInput';
 import { createItem } from './createItem';
 import { useItemForm, emptyItemForm } from './useItemForm';
+import { listLocationsByHousehold } from '../../db/locationRepository';
 import { useHousehold } from '../../services/householdContextValue';
 import { useToast } from '../../components/toast/toastContext';
 
@@ -12,10 +13,23 @@ const requiredMark = <span className="text-rose-500"> *</span>;
 
 export function AddItemPage() {
   const { householdId, userId, deviceId } = useHousehold();
-  const { state, setState, visibleErrors, isValid, setSubmitted } = useItemForm();
+  // 由位置詳情頁「在此位置新增物品」帶入的預選位置，只在掛載時讀取一次。
+  const preselectedLocationId = useMemo(() => new URLSearchParams(window.location.search).get('locationId') ?? '', []);
+  const { state, setState, visibleErrors, isValid, setSubmitted } = useItemForm(
+    preselectedLocationId ? { ...emptyItemForm, locationId: preselectedLocationId } : emptyItemForm
+  );
   const { show } = useToast();
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!preselectedLocationId) return;
+    void listLocationsByHousehold(householdId).then((locations) => {
+      if (!locations.some((location) => location.id === preselectedLocationId)) {
+        setState((prev) => ({ ...prev, locationId: '' }));
+      }
+    });
+  }, [preselectedLocationId, householdId, setState]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

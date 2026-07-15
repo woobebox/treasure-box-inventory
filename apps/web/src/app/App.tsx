@@ -1,4 +1,5 @@
 import { type MouseEvent, useEffect, useRef, useState } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import { AddItemPage } from '../features/items/AddItemPage';
 import { ItemDetailPage } from '../features/items/ItemDetailPage';
 import { HomePage } from '../features/home/HomePage';
@@ -10,12 +11,14 @@ import { BackupSettings } from '../features/settings/BackupSettings';
 import { TrashSettings } from '../features/settings/TrashSettings';
 import { TrashPage } from '../features/settings/TrashPage';
 import { LocationsPage } from '../features/locations/LocationsPage';
+import { LocationDetailPage } from '../features/locations/LocationDetailPage';
 import { SearchPage } from '../features/search/SearchPage';
 import { bottomNavRoutes } from './routes';
 import { toHref, toLogicalPath } from './basePath';
 import { supabase } from '../services/supabaseClient';
 import { useAuth } from '../services/authContext';
 import { useHousehold } from '../services/householdContextValue';
+import { useAutoSync } from '../sync/useSyncStatus';
 import { LoginPage } from '../features/auth/LoginPage';
 import { HouseholdOnboarding } from '../features/households/HouseholdOnboarding';
 
@@ -47,26 +50,42 @@ function CenteredNotice({ text }: { text: string }) {
   return <main className="flex min-h-dvh items-center justify-center p-6 text-sm text-slate-600">{text}</main>;
 }
 
+// Default parent page when a non-top-level route was opened without in-app
+// history (deep link / standalone cold start).
+function fallbackParentPath(path: string): string {
+  if (path.startsWith('/locations/')) return '/locations';
+  if (path === '/trash') return '/settings';
+  return '/';
+}
+
 function AppShell() {
+  useAutoSync();
   const [path, setPath] = useState(() => toLogicalPath(window.location.pathname));
-  const [isRouteLoading, setIsRouteLoading] = useState(false);
-  const routeTimer = useRef<number | undefined>(undefined);
-  const page = pageCopy[path] ?? { title: '物品詳情', description: '查看物品資料、目前位置、照片與移動歷史。' };
+  // Counts in-app navigations so the back button knows whether history.back()
+  // stays inside the app; deliberately not tracked across sessions.
+  const inAppNavCount = useRef(0);
+  const isTopLevel = bottomNavRoutes.some((route) => route.path === path);
+  const page = pageCopy[path] ?? (path.startsWith('/locations/')
+    ? { title: '位置詳情', description: '查看此位置與子位置內的物品。' }
+    : { title: '物品詳情', description: '查看物品資料、目前位置、照片與移動歷史。' });
 
   function completeNavigation(nextPath: string): void {
-    window.clearTimeout(routeTimer.current);
-    setIsRouteLoading(true);
-    routeTimer.current = window.setTimeout(() => {
-      setPath(nextPath);
-      setIsRouteLoading(false);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 220);
+    setPath(nextPath);
+    window.scrollTo({ top: 0 });
   }
 
-  function navigate(nextPath: string): void {
-    if (nextPath === path) return;
-    window.history.pushState({}, '', toHref(nextPath));
+  // Logical path state stays pathname-only; the query string only rides along
+  // in the address bar so target pages can read it on mount.
+  function navigate(nextPath: string, search = ''): void {
+    if (nextPath === path && !search) return;
+    window.history.pushState({}, '', toHref(nextPath) + search);
+    inAppNavCount.current += 1;
     completeNavigation(nextPath);
+  }
+
+  function handleBack(): void {
+    if (inAppNavCount.current > 0) window.history.back();
+    else navigate(fallbackParentPath(path));
   }
 
   function handleInternalLink(event: MouseEvent<HTMLDivElement>): void {
@@ -76,35 +95,41 @@ function AppShell() {
     const url = new URL(target.href);
     if (url.origin !== window.location.origin) return;
     event.preventDefault();
-    navigate(toLogicalPath(url.pathname));
+    navigate(toLogicalPath(url.pathname), url.search);
   }
 
   useEffect(() => {
-    const onPopState = () => completeNavigation(toLogicalPath(window.location.pathname));
-    window.addEventListener('popstate', onPopState);
-    return () => {
-      window.removeEventListener('popstate', onPopState);
-      window.clearTimeout(routeTimer.current);
+    const onPopState = () => {
+      inAppNavCount.current = Math.max(0, inAppNavCount.current - 1);
+      completeNavigation(toLogicalPath(window.location.pathname));
     };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
   }, []);
 
   return (
     <div onClickCapture={handleInternalLink} className="mx-auto flex min-h-screen max-w-md flex-col bg-slate-50 shadow-xl">
       <header className="sticky top-0 z-30 bg-teal-700 px-4 py-3 text-white shadow-sm">
-        <h1 className="text-lg font-semibold">{page.title}</h1>
+        <div className="flex items-center gap-1">
+          {!isTopLevel ? (
+            <button type="button" aria-label="返回" onClick={handleBack} className="-my-2 -ml-3 flex h-11 w-11 items-center justify-center rounded-xl text-white/90 hover:bg-teal-600">
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+          ) : null}
+          <h1 className="text-lg font-semibold">{page.title}</h1>
+        </div>
       </header>
       <main className="flex-1 px-4 py-5 pb-24">
         <section className="rounded-3xl border border-teal-100 bg-white p-5 shadow-sm">
-          {isRouteLoading ? (
-            <RouteSkeleton />
-          ) : (
-            <div key={path} className="page-content-enter">
+          <div key={path} className="page-content-enter">
               {path === '/' ? (
                 <HomePage />
               ) : path === '/add' ? (
                 <AddItemPage />
               ) : path === '/locations' ? (
                 <LocationsPage />
+              ) : path.startsWith('/locations/') ? (
+                <LocationDetailPage locationId={decodeURIComponent(path.split('/').pop() ?? '')} />
               ) : path === '/search' ? (
                 <SearchPage />
               ) : path === '/settings' ? (
@@ -119,8 +144,7 @@ function AppShell() {
                   <p className="mt-2 text-sm leading-6 text-slate-600">本地 IndexedDB、照片處理、同步與家庭權限相關路由已依 Spec Kit 任務規劃接上。</p>
                 </>
               )}
-            </div>
-          )}
+          </div>
         </section>
       </main>
       <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto grid max-w-md grid-cols-5 border-t border-slate-200 bg-white px-2 pb-[calc(0.25rem+env(safe-area-inset-bottom))] pt-1 shadow-[0_-2px_8px_rgb(15_23_42/0.06)]">
@@ -135,21 +159,6 @@ function AppShell() {
           );
         })}
       </nav>
-    </div>
-  );
-}
-
-function RouteSkeleton() {
-  return (
-    <div aria-label="頁面載入中" className="space-y-4">
-      <div className="skeleton-block h-5 w-2/3" />
-      <div className="skeleton-block h-4 w-full" />
-      <div className="skeleton-block h-4 w-5/6" />
-      <div className="grid gap-3 pt-2">
-        <div className="skeleton-block h-20 w-full" />
-        <div className="skeleton-block h-16 w-full" />
-        <div className="skeleton-block h-16 w-full" />
-      </div>
     </div>
   );
 }
