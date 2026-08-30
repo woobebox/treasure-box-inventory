@@ -35,4 +35,16 @@ describe('home recent items', () => {
     await waitFor(() => expect(screen.getByText(/使用中 · 工作室 \/ 工具抽屜/)).toBeInTheDocument());
     expect(screen.queryByText(/使用中 · 未設定位置/)).not.toBeInTheDocument();
   });
+
+  it('shows the empty state and dashboard quick actions when there are no items', async () => {
+    render(<HomePage />);
+
+    expect(screen.queryByText('目前沒有本機物品')).not.toBeInTheDocument();
+    expect(screen.getByRole('status', { name: '正在整理家庭摘要…' })).toBeInTheDocument();
+    expect(await screen.findByText('目前沒有本機物品')).toBeInTheDocument();
+    expect(screen.getByText('物品', { selector: 'p' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /新增第一件物品/ })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /搜尋物品/ })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /查閱位置/ })).toBeInTheDocument();
+  });
 });

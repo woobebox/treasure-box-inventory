@@ -11,6 +11,7 @@ export interface SyncSchedulerState {
   phase: SyncPhase;
   message: string;
   reasons: string[];
+  lastCompletedAt: string | null;
 }
 
 export type SyncReason = 'startup' | 'manual' | 'local-write' | 'foreground' | 'online';
@@ -35,7 +36,7 @@ const IDLE_MESSAGE = '尚未執行同步。';
 interface ActiveConfig { householdId: string; deviceId: string; pushFn: PushFn; pullFn: PullFn; }
 
 let activeConfig: ActiveConfig | null = null;
-let state: SyncSchedulerState = { enabled: false, pendingCount: 0, phase: 'idle', message: OFFLINE_MESSAGE, reasons: [] };
+let state: SyncSchedulerState = { enabled: false, pendingCount: 0, phase: 'idle', message: OFFLINE_MESSAGE, reasons: [], lastCompletedAt: null };
 const listeners = new Set<() => void>();
 
 let debounceTimer: ReturnType<typeof setTimeout> | undefined;
@@ -77,7 +78,7 @@ function attachTriggers(): void {
 export function configure(config: SyncSchedulerConfig): void {
   stop();
   if (!config.enabled) {
-    setState({ enabled: false, pendingCount: 0, phase: 'idle', message: OFFLINE_MESSAGE, reasons: [] });
+    setState({ enabled: false, pendingCount: 0, phase: 'idle', message: OFFLINE_MESSAGE, reasons: [], lastCompletedAt: null });
     return;
   }
   activeConfig = {
@@ -86,7 +87,7 @@ export function configure(config: SyncSchedulerConfig): void {
     pushFn: config.pushFn ?? pushOutbox,
     pullFn: config.pullFn ?? pullChanges
   };
-  setState({ enabled: true, pendingCount: 0, phase: 'idle', message: IDLE_MESSAGE, reasons: [] });
+  setState({ enabled: true, pendingCount: 0, phase: 'idle', message: IDLE_MESSAGE, reasons: [], lastCompletedAt: null });
   attachTriggers();
   const gen = generation;
   void countPending(activeConfig.householdId).then((pending) => {
@@ -133,11 +134,12 @@ export function requestSync(reason: SyncReason): Promise<void> {
         phase: pushed.conflicted > 0 || pushed.failed > 0 ? 'error' : 'success',
         pendingCount: pending,
         message: `已推送 ${pushed.synced} 筆，失敗 ${pushed.failed} 筆，衝突 ${pushed.conflicted} 筆，拉取 ${pulled.applied} 筆。`,
-        reasons: pushed.reasons ?? []
+        reasons: pushed.reasons ?? [],
+        lastCompletedAt: new Date().toISOString()
       });
     } catch (error) {
       if (gen !== generation) return;
-      setState({ phase: 'error', message: error instanceof Error ? error.message : '同步失敗。', reasons: [] });
+      setState({ phase: 'error', message: error instanceof Error ? error.message : '同步失敗。', reasons: [], lastCompletedAt: new Date().toISOString() });
     } finally {
       if (gen === generation) inFlight = null;
     }

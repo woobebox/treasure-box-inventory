@@ -9,14 +9,17 @@ import { usePhotoThumbnails } from './usePhotoThumbnails';
 import { PhotoInput } from './PhotoInput';
 import { useToast } from '../../components/toast/toastContext';
 import type { RetainedPhotoPayload } from '../../media/photoRetentionPolicy';
+import { Button, ConfirmDialog, IconButton } from '../../components/ui';
 
-interface Props { householdId: string; itemId: string; actorId: string; deviceId: string; coverPhotoId?: string | null; onChanged: () => void; }
+interface Props { householdId: string; itemId: string; itemName: string; actorId: string; deviceId: string; coverPhotoId?: string | null; onChanged: () => void; }
 
-export function PhotoGallery({ householdId, itemId, actorId, deviceId, coverPhotoId, onChanged }: Props) {
+export function PhotoGallery({ householdId, itemId, itemName, actorId, deviceId, coverPhotoId, onChanged }: Props) {
   const { show } = useToast();
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [draft, setDraft] = useState<RetainedPhotoPayload | undefined>();
   const [busy, setBusy] = useState(false);
+  const [busyPhotoId, setBusyPhotoId] = useState<string | null>(null);
+  const [removePhotoId, setRemovePhotoId] = useState<string | null>(null);
   const urls = usePhotoThumbnails(photos.map((photo) => photo.id));
 
   async function reload() { setPhotos(await listPhotosForItem(householdId, itemId)); }
@@ -35,35 +38,45 @@ export function PhotoGallery({ householdId, itemId, actorId, deviceId, coverPhot
   }
 
   async function handleRemove(photoId: string) {
-    try { await removePhoto({ householdId, itemId, photoId, actorId, deviceId }); show('已移除照片'); await reload(); onChanged(); }
+    setBusyPhotoId(photoId);
+    try { await removePhoto({ householdId, itemId, photoId, actorId, deviceId }); show('已移除照片'); setRemovePhotoId(null); await reload(); onChanged(); }
     catch (error) { show(error instanceof Error ? error.message : '移除照片失敗', 'error'); }
+    finally { setBusyPhotoId(null); }
   }
 
   async function setCover(photoId: string) {
-    await db.items.update(itemId, { coverPhotoId: photoId, updatedAt: new Date().toISOString() });
-    show('已設為封面'); onChanged();
+    setBusyPhotoId(photoId);
+    try {
+      await db.items.update(itemId, { coverPhotoId: photoId, updatedAt: new Date().toISOString() });
+      show('已設為封面'); onChanged();
+    } catch (error) {
+      show(error instanceof Error ? error.message : '設定封面失敗', 'error');
+    } finally {
+      setBusyPhotoId(null);
+    }
   }
 
   return (
     <section className="space-y-3">
       <h3 className="font-semibold text-slate-900">照片</h3>
       {photos.length > 0 ? (
-        <ul className="grid grid-cols-3 gap-2">
-          {photos.map((photo) => (
+        <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {photos.map((photo, index) => (
             <li key={photo.id} className="relative overflow-hidden rounded-xl border border-slate-200">
-              {urls[photo.id] ? <img src={urls[photo.id]} alt="物品照片" className="aspect-square w-full object-cover" /> : <div className="aspect-square w-full bg-slate-100" />}
+              {urls[photo.id] ? <img src={urls[photo.id]} alt={`${itemName}照片 ${index + 1}`} loading="lazy" className="aspect-square w-full object-cover" /> : <div className="aspect-square w-full bg-slate-100" />}
               {coverPhotoId === photo.id ? <span className="absolute left-1 top-1 rounded-full bg-teal-700 px-1.5 py-0.5 text-[10px] text-white">封面</span> : null}
               <div className="absolute bottom-1 right-1 flex gap-1">
-                {coverPhotoId !== photo.id ? <button type="button" aria-label="設為封面" onClick={() => void setCover(photo.id)} className="rounded-full bg-white/90 p-1 text-slate-700"><Star className="h-3.5 w-3.5" /></button> : null}
-                <button type="button" aria-label="移除照片" onClick={() => void handleRemove(photo.id)} className="rounded-full bg-white/90 p-1 text-rose-600"><Trash2 className="h-3.5 w-3.5" /></button>
+                {coverPhotoId !== photo.id ? <IconButton aria-label="設為封面" disabled={busyPhotoId !== null} onClick={() => void setCover(photo.id)} className="rounded-xl bg-white/95 shadow-sm"><Star aria-hidden="true" className="h-4 w-4" /></IconButton> : null}
+                <IconButton variant="danger" aria-label="移除照片" disabled={busyPhotoId !== null} onClick={() => setRemovePhotoId(photo.id)} className="rounded-xl bg-white/95 shadow-sm"><Trash2 aria-hidden="true" className="h-4 w-4" /></IconButton>
               </div>
             </li>
           ))}
         </ul>
-      ) : <p className="text-sm text-slate-500">尚無照片。</p>}
+      ) : <p className="text-sm text-slate-600">尚無照片。</p>}
 
       <PhotoInput value={draft} onChange={setDraft} />
-      {draft ? <button type="button" onClick={() => void handleAdd()} disabled={busy} className="w-full rounded-2xl bg-teal-700 px-4 py-2 text-sm font-semibold text-white disabled:bg-slate-300">{busy ? '新增中…' : '新增此照片'}</button> : null}
+      {draft ? <Button type="button" onClick={() => void handleAdd()} busy={busy} fullWidth>新增此照片</Button> : null}
+      <ConfirmDialog open={Boolean(removePhotoId)} title="移除這張照片？" description="照片會從此物品移除；如果它是封面，系統會自動改用其他照片。" confirmLabel="確認移除" busy={Boolean(busyPhotoId)} onCancel={() => setRemovePhotoId(null)} onConfirm={() => { if (removePhotoId) void handleRemove(removePhotoId); }} />
     </section>
   );
 }

@@ -84,6 +84,7 @@ describe('sync scheduler', () => {
     release();
     await vi.runAllTimersAsync();
     expect(getState().phase).toBe('success');
+    expect(getState().lastCompletedAt).not.toBeNull();
   });
 
   it('前景與上線觸發受最小間隔節流', async () => {

@@ -1,9 +1,9 @@
 # Current Session Progress
 
-- **Current Active Feature**: `002-mobile-ux-uplift`（`.specify/feature.json` 已切換）
-- **Latest Verified Action**: 2026-07-15 — 重新驗證 002 全流程（T001–T019 全勾）：自動同步排程器、移除路由 220ms 假延遲、位置詳情頁 `/locations/:id`、非頂層路由返回鍵。`typecheck`/`lint`/`test`（21 files / 54 tests，基準 18/39）/`build` 全綠。
-- **Current Blockers**: `026bf5e` 與 002 的 `5a2a5e9` 已提交但尚未推送；目前終端對 GitHub HTTPS 無認證（`could not read Username`），且未安裝 GitHub CLI。quickstart A–E 手動情境（雙裝置自動同步、實機 standalone 返回鍵）待使用者驗收。
-- **Next Best Action**: 完成 GitHub 認證後 push main 觸發 Pages，部署後依 `.specify/features/002-mobile-ux-uplift/quickstart.md` 以兩台裝置驗收自動同步與位置詳情動線。
+- **Current Active Feature**: `004-ui-ux-hardening`（`.specify/feature.json` 已切換）
+- **Latest Verified Action**: 2026-08-30 — 完成 003/004 UI／UX 變更 commit（93 files），並通過 `npm run typecheck`、`npm run lint`、`npm run test`（26 files / 63 tests）、`npm run build`、`git diff --cached --check`。
+- **Current Blockers**: 內建瀏覽器安全政策阻擋 agent 重新載入 localhost；未繞過。004 的 375×812、768×1024、1024×768 新版視覺與 200% zoom／reduced-motion 實機操作待使用者重新整理現有分頁後驗收。
+- **Next Best Action**: 以已登入 GitHub 的環境執行 `git push origin main`，確認 Web CI 與 GitHub Pages workflow 成功，再依 quickstart 完成實機驗收。
 
 ## Session Memory Routine（依使用者要求 2026-06-29）
 
@@ -12,6 +12,27 @@
 - 本檔即為跨 session 記憶來源；`AGENTS.md` 規則 1 與 5 已涵蓋此流程。
 
 ## Session Log
+
+### 2026-08-30 003/004 UI／UX commit
+
+- **Completed Action**: 將 003 平板智慧家居儀表板與 004 全 App UI／UX 強化的 Spec Kit 文件、runtime、回歸測試與 003 交接備份整理為單一 commit；清理新增 Markdown 的 trailing whitespace 與檔尾空白行。
+- **Verification**: `npm run typecheck`、`npm run lint`、`npm run test`（26 files / 63 tests）、`npm run build`、`git diff --cached --check` 全部成功。Build 僅有既有單一 bundle 大於 500 kB 的警告。
+- **Current Blockers**: commit 尚未 push；GitHub Actions 與 Pages 尚未驗證。004 的 375×812、768×1024、1024×768、200% zoom／reduced-motion 實機驗收仍待使用者完成。
+- **Next Best Action**: 執行 `git push origin main`，確認 `Web CI` 與 `Deploy to GitHub Pages` 成功，再做正式 Pages 與裝置驗收。
+
+### 2026-08-27 004 全 App UI／UX 完成度強化
+
+- **Completed Action**: 依 Specify → Plan → Tasks → Implement 建立 `004-ui-ux-hardening`。新增明確 loading／error／empty 狀態及 retry；建立具 focus trap、Escape、初始焦點、焦點還原與 body scroll lock 的 ConfirmDialog；Toast 改 live region + close；App 加 skip link、route main focus、page description 與 history scroll snapshot；搜尋加入 URL filter round-trip、250ms debounce、request race guard、aria-expanded／aria-live 與 clear-all；首頁改 768px 兩欄快捷卡並顯示 runtime 最近同步結果；位置改漸進新增與可收合 tree；物品／照片／選項／成員危險操作統一確認與 busy；登入、表單、家庭設定、設定分組、contrast 與 48px controls 完成強化。未改 IndexedDB／Supabase schema、sync payload、權限或公開 pathname。
+- **Verification**: `npm run typecheck`、`npm run lint`、`npm test`（26 files / 63 tests）、`npm run build`、`git diff --check` 全部成功。新增 dialog focus、Toast close、搜尋 URL／debounce／race、form invalid focus、loading flash、route focus、sync timestamp 回歸；build 只有既有 >500 kB bundle warning。
+- **Current Blockers**: 內建瀏覽器發現現有 localhost 分頁，但 agent reload 被 URL 安全政策阻擋；依規則未改走 Chrome／Playwright 繞過。三 viewport、200% zoom、reduced-motion 新版視覺待使用者本機重新整理確認。
+- **Next Best Action**: 使用者依 `.specify/features/004-ui-ux-hardening/quickstart.md` 完成 T026／T027 實機驗收，再 review 並提交 003+004。
+
+### 2026-08-19 003 平板智慧家居儀表板 UI／UX 完成
+
+- **Completed Action**: 依 Specify → Plan → Tasks → Implement 完成 `003-tablet-smart-home-ui`。建立 semantic tokens 與 `Button`／`ActionLink`／`IconButton`／`ActionTile`；App Shell 在 768px 切換左側 rail、1024px 置中封頂，手機維持底部導覽；首頁加入家庭摘要、物品／位置／待同步數量、三個既有路由快捷控制與最近物品雙欄；登入、新增、搜尋、位置、詳情、照片、設定、家庭成員與彈窗控制統一 48px 觸控、focus、busy、disabled、danger 狀態。未變更 IndexedDB、Supabase、同步 payload、權限或公開路由。
+- **Verification**: `npm run typecheck`、`npm run lint`（0 warnings）、`npm test`（22 files / 57 tests）、`npm run build`、`git diff --check` 全部成功；本機 Vite + Playwright 截圖檢查 375×812、768×1024、1024×768，並檢查 `/add`、`/search`、`/locations`、`/settings` 的 768px 版面。Build 僅有既有單一 bundle >500 kB 提示。
+- **Current Blockers**: 正式裝置鍵盤循序、瀏覽器文字放大、reduced-motion 仍需 release smoke test；未影響本機完成度。
+- **Next Best Action**: Review 變更、建立提交並在 GitHub 認證後推送，接著做正式部署與實機驗收。
 
 ### 2026-07-15 002 手機 UX 優化提交完成、推送待 GitHub 認證
 

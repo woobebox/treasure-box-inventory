@@ -7,6 +7,7 @@ import { exportManifest, type BackupManifest } from '../backup/exportManifest';
 import { restoreDryRun, type RestoreDryRunResult } from '../backup/restoreDryRun';
 import { restoreManifest } from '../backup/restoreManifest';
 import { useHousehold } from '../../services/householdContextValue';
+import { ActionLink, Button } from '../../components/ui';
 
 interface RestoreCandidate {
   filename: string;
@@ -24,8 +25,8 @@ interface PreparedDownloads {
   photos: number;
 }
 
-const backupActionClass = 'inline-flex cursor-pointer items-center justify-center rounded-xl border border-teal-200 bg-teal-50 px-3 py-2 text-sm font-semibold text-teal-800 transition-colors hover:bg-teal-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2';
-const preparingActionClass = 'inline-flex items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-400';
+const preparingActionClass = 'inline-flex min-h-12 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-600';
+const uploadActionClass = 'inline-flex min-h-12 cursor-pointer items-center justify-center rounded-2xl border border-teal-200 bg-teal-50 px-4 text-sm font-semibold text-teal-800 transition-colors hover:bg-teal-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2';
 
 export function BackupSettings() {
   const { householdId } = useHousehold();
@@ -107,18 +108,18 @@ export function BackupSettings() {
   }
 
   return (
-    <div className="space-y-3">
-      <h2 className="font-semibold text-slate-900">備份與還原</h2>
+    <section className="page-section space-y-4">
+      <div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-700">資料安全</p><h2 className="mt-1 text-lg font-bold text-slate-900">備份與還原</h2></div>
       <p className="text-sm text-slate-600">JSON 用於完整資料結構備份與還原；CSV 只是可用試算表開啟的物品摘要，不能完整還原。</p>
       <div className="flex flex-wrap gap-2">
-        {downloads ? <a href={downloads.jsonUrl} download={downloads.jsonFilename} onClick={downloadedJson} className={backupActionClass}>下載 JSON 備份</a> : <span className={preparingActionClass}>準備 JSON…</span>}
-        {downloads ? <a href={downloads.csvUrl} download={downloads.csvFilename} onClick={downloadedCsv} className={backupActionClass}>下載 CSV 摘要</a> : <span className={preparingActionClass}>準備 CSV…</span>}
-        <label className={backupActionClass}>
+        {downloads ? <ActionLink href={downloads.jsonUrl} download={downloads.jsonFilename} onClick={downloadedJson} variant="secondary">下載 JSON 備份</ActionLink> : <span className={preparingActionClass}>準備 JSON…</span>}
+        {downloads ? <ActionLink href={downloads.csvUrl} download={downloads.csvFilename} onClick={downloadedCsv} variant="secondary">下載 CSV 摘要</ActionLink> : <span className={preparingActionClass}>準備 CSV…</span>}
+        <label className={uploadActionClass}>
           匯入 JSON 備份資料
           <input ref={fileInputRef} className="hidden" type="file" accept="application/json,.json" onChange={(event) => { const file = event.target.files?.[0]; if (file) void inspectBackup(file); }} />
         </label>
       </div>
-      <p className="text-xs text-slate-500">匯入前會先檢查格式並顯示筆數，不會直接覆蓋資料。確認後採安全合併：相同 ID 更新，其餘現有資料保留。</p>
+      <p className="text-xs text-slate-600">匯入前會先檢查格式並顯示筆數，不會直接覆蓋資料。確認後採安全合併：相同 ID 更新，其餘現有資料保留。</p>
       {message ? <p className="text-sm text-slate-600">{message}</p> : null}
       {candidate ? (
         <div className={`rounded-xl border p-3 ${candidate.dryRun.valid ? 'border-teal-200 bg-teal-50' : 'border-red-200 bg-red-50'}`}>
@@ -126,11 +127,11 @@ export function BackupSettings() {
           {candidate.dryRun.valid ? (
             <>
               <p className="mt-1 text-sm text-teal-800">格式有效：{candidate.dryRun.counts.items} 件物品、{candidate.dryRun.counts.locations} 個位置、{candidate.dryRun.counts.tags} 個標籤。</p>
-              <button type="button" disabled={restoring} onClick={() => void confirmRestore()} className="mt-3 rounded-xl bg-teal-700 px-3 py-2 text-sm font-semibold text-white disabled:opacity-60">{restoring ? '還原中…' : '確認匯入並合併'}</button>
+              <Button type="button" busy={restoring} onClick={() => void confirmRestore()} className="mt-3">確認匯入並合併</Button>
             </>
           ) : <p className="mt-1 text-sm text-red-700">{candidate.dryRun.errors.join(' ')}</p>}
         </div>
       ) : null}
-    </div>
+    </section>
   );
 }

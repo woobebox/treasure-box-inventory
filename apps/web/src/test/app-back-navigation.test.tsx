@@ -55,6 +55,7 @@ describe('app back navigation', () => {
     const link = await screen.findByRole('link', { name: '導覽測試櫃' });
     fireEvent.click(link);
     await waitFor(() => expect(screen.getByRole('heading', { name: '位置詳情' })).toBeInTheDocument());
+    expect(screen.getByRole('main')).toHaveFocus();
 
     fireEvent.click(screen.getByLabelText('返回'));
     await waitFor(() => expect(screen.getByRole('heading', { name: '位置管理' })).toBeInTheDocument());
