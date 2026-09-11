@@ -1,9 +1,9 @@
 # Current Session Progress
 
-- **Current Active Feature**: `004-ui-ux-hardening`（`.specify/feature.json` 已切換）
-- **Latest Verified Action**: 2026-08-30 — 完成 003/004 UI／UX 變更 commit（93 files），並通過 `npm run typecheck`、`npm run lint`、`npm run test`（26 files / 63 tests）、`npm run build`、`git diff --cached --check`。
-- **Current Blockers**: 內建瀏覽器安全政策阻擋 agent 重新載入 localhost；未繞過。004 的 375×812、768×1024、1024×768 新版視覺與 200% zoom／reduced-motion 實機操作待使用者重新整理現有分頁後驗收。
-- **Next Best Action**: 以已登入 GitHub 的環境執行 `git push origin main`，確認 Web CI 與 GitHub Pages workflow 成功，再依 quickstart 完成實機驗收。
+- **Current Active Feature**: `005-inventory-flow-optimization`（`.specify/feature.json` 已切換）
+- **Latest Verified Action**: 2026-09-09 — 依 005 完成物品編輯、連續新增、文字草稿與站內離開保護、搜尋排序／清單、首頁操作前移、語意 UI 元件、開發預覽、路由拆分及 1280px 寬平板 shell。
+- **Current Blockers**: 自動檢查與 375／768／1024 瀏覽器驗收通過；目前 UI 工具無法切換 200% browser zoom 與 reduced-motion 模擬，005 T013 因此維持未完成。正式 Supabase 雙裝置同步仍需部署環境驗收。
+- **Next Best Action**: 推送 005 commit 至 `origin/main` 並確認 Web CI／GitHub Pages；再以正式裝置補做 200% zoom、reduced-motion 及雙裝置 item.update/tag sync。
 
 ## Session Memory Routine（依使用者要求 2026-06-29）
 
@@ -12,6 +12,21 @@
 - 本檔即為跨 session 記憶來源；`AGENTS.md` 規則 1 與 5 已涵蓋此流程。
 
 ## Session Log
+
+### 2026-09-09 005 收納流程與 UI 維護優化
+
+- **Completed Action**: 建立 005 Spec Kit。新增原子化 `item.update`（含 tags/history/sync）；詳情頁 inline edit；新增頁「儲存並查看／繼續新增」；家庭／使用者隔離且不含照片的 session draft；站內導覽捨棄確認；搜尋排序與卡片／清單 URL state；首頁快速操作前移；語意 token 與 PageHeader／SectionCard／FormField／StatusBadge；dev-only `/ui-preview`；React route lazy loading 與 Supabase/Dexie vendor chunks。另建立 `design-system/MASTER.md`。
+- **Completed Action**: 寬平板複驗發現 1024px shell 在 1366px viewport 造成左右各 171px 留白；將 shell 上限調整為 1280px，並於 `xl` 將導覽 rail 擴至 128px。1366px viewport 現僅保留左右各 43px 外距，主內容由 912px 增為 1152px。
+- **Verification**: `npm run typecheck`、`npm run lint`、`npm run test`（29 files / 71 tests）、`npm run build`、`git diff --check` 全部通過；build 最大 entry 約 229 kB，無 >500 kB warning。瀏覽器 375×812、768×1024、1024×768、1194×834、1366×1024 無水平 overflow；手機 bottom nav／平板 rail、搜尋 URL list view、未儲存 dialog、dev preview、1024 三欄與 1280px 寬版 shell 複驗通過；console 無 error/warning。
+- **Current Blockers**: 200% browser zoom 與實際 reduced-motion 模擬無法由目前 UI 工具切換；正式 Supabase item.update/tag 雙裝置同步未驗收。
+- **Next Best Action**: 推送並確認 Web CI／GitHub Pages，再補實機 zoom/reduced-motion/同步 smoke。
+
+### 2026-09-09 UI／UX 與介面維護優化評估
+
+- **Completed Action**: 檢視 004 spec/plan/tasks、App、首頁、新增／詳情、搜尋、樣式與共用控制。確認已有基礎與尚缺的編輯入口、連續新增位置保留、站內草稿保護、樣式 token 完整套用；保存具程式證據、優先順序及驗收條件的提案。保留本檔原有課堂標的未提交紀錄。
+- **Verification**: 靜態檢視與 UI/UX skill 參考查詢完成；MDN 已確認 beforeunload 的行動裝置限制。未執行 `npm run typecheck`、`npm run lint`、`npm run test`、`npm run build`：本次僅文件評估，無產品變更。瀏覽器、雙裝置同步與效能均未實測。
+- **Current Blockers**: 無提案 blocker；004 T026/T027 維持未勾選。
+- **Next Best Action**: 以 `specUserStory/ui-ux-improvement-review-2026-09-09.md` 排定下一批規格，保留既有 teal／1024px／手機底部導覽合約。
 
 ### 2026-08-30 003/004 UI／UX commit
 

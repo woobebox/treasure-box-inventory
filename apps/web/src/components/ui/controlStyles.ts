@@ -5,13 +5,13 @@ export function cx(...classes: Array<string | undefined | false>): string {
   return classes.filter(Boolean).join(' ');
 }
 
-export const controlBase = 'inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-2xl border px-4 text-sm font-semibold touch-manipulation transition-[background-color,border-color,box-shadow,color,opacity,transform] duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50';
+export const controlBase = 'inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-2xl border px-4 text-sm font-semibold touch-manipulation transition-[background-color,border-color,box-shadow,color,opacity,transform] duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-focus)] focus-visible:ring-offset-2 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50';
 
 export const controlVariants: Record<ControlVariant, string> = {
-  primary: 'border-teal-700 bg-teal-700 text-white shadow-sm hover:border-teal-800 hover:bg-teal-800 active:border-teal-900 active:bg-teal-900',
-  secondary: 'border-teal-200 bg-teal-50 text-teal-800 shadow-sm hover:border-teal-300 hover:bg-teal-100',
-  ghost: 'border-transparent bg-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900',
-  danger: 'border-rose-600 bg-rose-600 text-white shadow-sm hover:border-rose-700 hover:bg-rose-700 active:border-rose-800 active:bg-rose-800',
+  primary: 'border-[var(--ui-primary)] bg-[var(--ui-primary)] text-[var(--ui-on-primary)] shadow-sm hover:border-[var(--ui-primary-hover)] hover:bg-[var(--ui-primary-hover)]',
+  secondary: 'border-[var(--ui-primary-soft-hover)] bg-[var(--ui-primary-soft)] text-[var(--ui-primary-hover)] shadow-sm hover:bg-[var(--ui-primary-soft-hover)]',
+  ghost: 'border-transparent bg-transparent text-[var(--ui-text-muted)] hover:border-[var(--ui-border)] hover:bg-[var(--ui-surface-muted)] hover:text-[var(--ui-text)]',
+  danger: 'border-[var(--ui-danger)] bg-[var(--ui-danger)] text-white shadow-sm hover:border-[var(--ui-danger-hover)] hover:bg-[var(--ui-danger-hover)]',
 };
 
 export const controlSizes: Record<ControlSize, string> = {
@@ -19,9 +19,9 @@ export const controlSizes: Record<ControlSize, string> = {
   lg: 'min-h-14 px-5 text-base',
 };
 
-export const iconButtonBase = 'inline-flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center rounded-2xl border transition-[background-color,border-color,box-shadow,color,opacity,transform] duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-50 touch-manipulation';
+export const iconButtonBase = 'inline-flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center rounded-2xl border transition-[background-color,border-color,box-shadow,color,opacity,transform] duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-focus)] focus-visible:ring-offset-2 active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-50 touch-manipulation';
 
 export const iconButtonVariants: Record<'ghost' | 'danger', string> = {
-  ghost: 'border-transparent text-slate-600 hover:border-teal-100 hover:bg-teal-50 hover:text-teal-700',
-  danger: 'border-transparent text-rose-700 hover:border-rose-100 hover:bg-rose-50 hover:text-rose-800',
+  ghost: 'border-transparent text-[var(--ui-text-muted)] hover:border-[var(--ui-border)] hover:bg-[var(--ui-primary-soft)] hover:text-[var(--ui-primary)]',
+  danger: 'border-transparent text-[var(--ui-danger)] hover:border-rose-100 hover:bg-rose-50 hover:text-[var(--ui-danger-hover)]',
 };

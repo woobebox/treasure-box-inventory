@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { RotateCcw } from 'lucide-react';
+import { Grid2X2, List, RotateCcw } from 'lucide-react';
 import { db } from '../../db/database';
 import { listItemsByHousehold } from '../../db/itemRepository';
 import { listLocationsByHousehold } from '../../db/locationRepository';
@@ -101,12 +101,26 @@ export function SearchPage() {
 
       <SearchFilters value={filters} onChange={updateFilters} categories={categories} locations={locations.map(({ id, path }) => ({ id, path }))} tags={tags.map(({ id, name }) => ({ id, name }))} busy={metadataLoading || resultsLoading} />
 
+      <div className="flex flex-col gap-3 rounded-2xl border border-[var(--ui-border)] bg-[var(--ui-surface)] p-3 sm:flex-row sm:items-end sm:justify-between">
+        <label className="text-sm font-semibold text-slate-700">結果排序
+          <select value={filters.sort ?? 'updated-desc'} onChange={(event) => updateFilters({ ...filters, sort: event.target.value as FilterState['sort'] })} className="field-control mt-1 w-full min-w-48 font-normal">
+            <option value="updated-desc">最近更新</option>
+            <option value="created-desc">最近建立</option>
+            <option value="name-asc">名稱 A–Z</option>
+          </select>
+        </label>
+        <div className="grid grid-cols-2 gap-2" role="group" aria-label="結果顯示方式">
+          <Button type="button" variant={(filters.view ?? 'grid') === 'grid' ? 'primary' : 'ghost'} aria-pressed={(filters.view ?? 'grid') === 'grid'} leadingIcon={<Grid2X2 aria-hidden="true" className="h-4 w-4" />} onClick={() => updateFilters({ ...filters, view: 'grid' })}>卡片</Button>
+          <Button type="button" variant={filters.view === 'list' ? 'primary' : 'ghost'} aria-pressed={filters.view === 'list'} leadingIcon={<List aria-hidden="true" className="h-4 w-4" />} onClick={() => updateFilters({ ...filters, view: 'list' })}>清單</Button>
+        </div>
+      </div>
+
       {error ? <ErrorState title="無法完成搜尋" message={error} actionLabel="重試" onAction={() => { setMetadataLoading(true); setResultsLoading(true); setError(null); setRetryRevision((value) => value + 1); }} /> : null}
       {!error ? <p aria-live="polite" className="text-sm font-medium text-slate-600">{resultsLoading ? '正在搜尋本機物品…' : `找到 ${results.length} 筆本機結果`}</p> : null}
       {!error && resultsLoading && results.length === 0 ? <LoadingState label="正在搜尋本機物品…" rows={2} /> : null}
       {!error && results.length > 0 ? (
-        <ul className={`grid gap-3 md:grid-cols-2 md:gap-4 ${resultsLoading ? 'opacity-60' : ''}`} aria-busy={resultsLoading}>
-          {results.map(({ item, location, tags: itemTags }) => <li key={item.id}><ItemCard item={item} locationPath={location?.path} tagNames={itemTags.map((tag) => tag.name)} /></li>)}
+        <ul className={`${filters.view === 'list' ? 'space-y-2' : 'grid gap-3 md:grid-cols-2 md:gap-4'} ${resultsLoading ? 'opacity-60' : ''}`} aria-busy={resultsLoading}>
+          {results.map(({ item, location, tags: itemTags }) => <li key={item.id}><ItemCard item={item} locationPath={location?.path} tagNames={itemTags.map((tag) => tag.name)} compact={filters.view === 'list'} /></li>)}
         </ul>
       ) : null}
       {!error && !resultsLoading && results.length === 0 ? (

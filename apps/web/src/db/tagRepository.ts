@@ -26,6 +26,12 @@ export async function listTagsByHousehold(householdId: string): Promise<Tag[]> {
   return db.tags.where('householdId').equals(householdId).filter((tag) => !tag.deletedAt).sortBy('normalizedName');
 }
 
+export async function listTagNamesForItem(householdId: string, itemId: string): Promise<string[]> {
+  const links = await db.itemTags.where('itemId').equals(itemId).filter((row) => row.householdId === householdId).toArray();
+  const tags = await db.tags.bulkGet(links.map((row) => row.tagId));
+  return tags.filter((tag): tag is Tag => Boolean(tag && tag.householdId === householdId && !tag.deletedAt)).map((tag) => tag.name);
+}
+
 export async function replaceItemTags(householdId: string, itemId: string, tagIds: string[]): Promise<ItemTag[]> {
   if (!householdId.trim()) throw new Error('缺少家庭識別碼');
   await db.itemTags.where('itemId').equals(itemId).delete();

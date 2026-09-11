@@ -5,7 +5,7 @@ import { ActionLink, ActionTile, Button, IconButton } from '../components/ui';
 describe('shared control primitives', () => {
   it('renders button variants and busy state accessibly', () => {
     const { rerender } = render(<Button variant="danger">刪除</Button>);
-    expect(screen.getByRole('button', { name: '刪除' })).toHaveClass('bg-rose-600');
+    expect(screen.getByRole('button', { name: '刪除' })).toHaveClass('bg-[var(--ui-danger)]');
 
     rerender(<Button busy>儲存</Button>);
     expect(screen.getByRole('button', { name: '處理中…' })).toBeDisabled();

@@ -8,3 +8,7 @@ export { IconButton } from './IconButton';
 export type { IconButtonProps } from './IconButton';
 export { ConfirmDialog } from './ConfirmDialog';
 export type { ConfirmDialogProps } from './ConfirmDialog';
+export { PageHeader } from './PageHeader';
+export { SectionCard } from './SectionCard';
+export { FormField } from './FormField';
+export { StatusBadge } from './StatusBadge';

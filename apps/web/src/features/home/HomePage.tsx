@@ -93,8 +93,8 @@ export function HomePage() {
   }, [householdId, sync.phase, retryRevision]);
 
   return (
-    <div className="space-y-6">
-      <section className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-teal-700 via-teal-800 to-teal-950 p-6 text-white shadow-[0_18px_42px_rgb(15_118_110/0.22)] md:p-8">
+    <div className="flex flex-col gap-6">
+      <section className="relative order-1 overflow-hidden rounded-[2rem] bg-gradient-to-br from-teal-700 via-teal-800 to-teal-950 p-6 text-white shadow-[0_18px_42px_rgb(15_118_110/0.22)] md:p-8">
         <div className="pointer-events-none absolute -right-12 -top-16 h-48 w-48 rounded-full bg-white/10 blur-2xl" />
         <p className="relative text-xs font-semibold uppercase tracking-[0.18em] text-teal-100">目前家庭</p>
         <p className="relative mt-2 text-2xl font-bold md:text-3xl">{householdName || '本機示範家庭'}</p>
@@ -102,9 +102,9 @@ export function HomePage() {
         <SyncIndicator />
       </section>
 
-      {loadError ? <ErrorState title="無法載入家庭總覽" message={loadError} actionLabel="重試" onAction={() => { setLoading(true); setLoadError(null); setRetryRevision((value) => value + 1); }} /> : null}
+      {loadError ? <div className="order-3"><ErrorState title="無法載入家庭總覽" message={loadError} actionLabel="重試" onAction={() => { setLoading(true); setLoadError(null); setRetryRevision((value) => value + 1); }} /></div> : null}
 
-      {!loadError ? <section aria-labelledby="home-summary-heading">
+      {!loadError ? <section className="order-3" aria-labelledby="home-summary-heading">
         <div className="mb-3 flex items-end justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-700">家庭總覽</p>
@@ -121,17 +121,17 @@ export function HomePage() {
         )}
       </section> : null}
 
-      <section aria-labelledby="quick-actions-heading">
+      <section className="order-2" aria-labelledby="quick-actions-heading">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-700">快速操作</p>
         <h2 id="quick-actions-heading" className="mt-1 text-xl font-bold text-slate-900">想要做什麼？</h2>
-        <div className="mt-3 grid gap-3 md:grid-cols-2 md:gap-4 min-[960px]:grid-cols-3">
+        <div className="mt-3 grid gap-3 md:grid-cols-2 md:gap-4 lg:grid-cols-3">
           <ActionTile href={toHref('/add')} icon={<Plus aria-hidden="true" className="text-teal-700" />} title="新增物品" description="拍照或輸入資料，立即存到本機" tone="teal" />
           <ActionTile href={toHref('/search')} icon={<Search aria-hidden="true" className="text-sky-700" />} title="搜尋物品" description="依名稱、標籤或位置快速找回" tone="slate" />
           <ActionTile href={toHref('/locations')} icon={<MapIcon aria-hidden="true" className="text-amber-700" />} title="查閱位置" description="從房間、櫃位到箱子逐層瀏覽" tone="amber" />
         </div>
       </section>
 
-      {!loadError ? <section className="page-section" aria-labelledby="recent-items-heading">
+      {!loadError ? <section className="page-section order-4" aria-labelledby="recent-items-heading">
         <div className="flex items-end justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-700">最近更新</p>

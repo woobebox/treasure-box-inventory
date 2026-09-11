@@ -1,18 +1,5 @@
-import { type MouseEvent, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, type MouseEvent, useEffect, useRef, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { AddItemPage } from '../features/items/AddItemPage';
-import { ItemDetailPage } from '../features/items/ItemDetailPage';
-import { HomePage } from '../features/home/HomePage';
-import { StorageSettings } from '../features/settings/StorageSettings';
-import { SyncSettings } from '../features/settings/SyncSettings';
-import { OptionSettings } from '../features/settings/OptionSettings';
-import { HouseholdSettingsPage } from '../features/households/HouseholdSettingsPage';
-import { BackupSettings } from '../features/settings/BackupSettings';
-import { TrashSettings } from '../features/settings/TrashSettings';
-import { TrashPage } from '../features/settings/TrashPage';
-import { LocationsPage } from '../features/locations/LocationsPage';
-import { LocationDetailPage } from '../features/locations/LocationDetailPage';
-import { SearchPage } from '../features/search/SearchPage';
 import { bottomNavRoutes } from './routes';
 import { toHref, toLogicalPath } from './basePath';
 import { supabase } from '../services/supabaseClient';
@@ -21,6 +8,22 @@ import { useHousehold } from '../services/householdContextValue';
 import { useAutoSync } from '../sync/useSyncStatus';
 import { LoginPage } from '../features/auth/LoginPage';
 import { HouseholdOnboarding } from '../features/households/HouseholdOnboarding';
+import { requestAppNavigation } from './navigationRequest';
+
+const AddItemPage = lazy(() => import('../features/items/AddItemPage').then((module) => ({ default: module.AddItemPage })));
+const ItemDetailPage = lazy(() => import('../features/items/ItemDetailPage').then((module) => ({ default: module.ItemDetailPage })));
+const HomePage = lazy(() => import('../features/home/HomePage').then((module) => ({ default: module.HomePage })));
+const StorageSettings = lazy(() => import('../features/settings/StorageSettings').then((module) => ({ default: module.StorageSettings })));
+const SyncSettings = lazy(() => import('../features/settings/SyncSettings').then((module) => ({ default: module.SyncSettings })));
+const OptionSettings = lazy(() => import('../features/settings/OptionSettings').then((module) => ({ default: module.OptionSettings })));
+const HouseholdSettingsPage = lazy(() => import('../features/households/HouseholdSettingsPage').then((module) => ({ default: module.HouseholdSettingsPage })));
+const BackupSettings = lazy(() => import('../features/settings/BackupSettings').then((module) => ({ default: module.BackupSettings })));
+const TrashSettings = lazy(() => import('../features/settings/TrashSettings').then((module) => ({ default: module.TrashSettings })));
+const TrashPage = lazy(() => import('../features/settings/TrashPage').then((module) => ({ default: module.TrashPage })));
+const LocationsPage = lazy(() => import('../features/locations/LocationsPage').then((module) => ({ default: module.LocationsPage })));
+const LocationDetailPage = lazy(() => import('../features/locations/LocationDetailPage').then((module) => ({ default: module.LocationDetailPage })));
+const SearchPage = lazy(() => import('../features/search/SearchPage').then((module) => ({ default: module.SearchPage })));
+const UiPreviewPage = lazy(() => import('../features/dev/UiPreviewPage').then((module) => ({ default: module.UiPreviewPage })));
 
 const pageCopy: Record<string, { title: string; description: string }> = {
   '/': { title: '收納寶盒', description: '離線優先的家庭照片庫存儀表板。' },
@@ -28,7 +31,8 @@ const pageCopy: Record<string, { title: string; description: string }> = {
   '/add': { title: '新增物品', description: '拍攝或上傳照片，先安全儲存在本機。' },
   '/search': { title: '搜尋物品', description: '依名稱、標籤、分類、位置、日期或狀態找回物品。' },
   '/settings': { title: '系統設定', description: '管理同步、儲存空間、備份、家庭與安裝狀態。' },
-  '/trash': { title: '已刪除物品', description: '30 天內可還原，逾期永久移除。' }
+  '/trash': { title: '已刪除物品', description: '30 天內可還原，逾期永久移除。' },
+  '/ui-preview': { title: '介面元件預覽', description: '集中比較共用控制、欄位與狀態。' }
 };
 
 // Gate: when Supabase is configured, require a signed-in user and a selected
@@ -78,7 +82,7 @@ function AppShell() {
 
   // Logical path state stays pathname-only; the query string only rides along
   // in the address bar so target pages can read it on mount.
-  function navigate(nextPath: string, search = ''): void {
+  function performNavigation(nextPath: string, search = ''): void {
     if (nextPath === path && !search) return;
     window.history.replaceState({ ...(window.history.state ?? {}), scrollY: window.scrollY }, '', window.location.href);
     window.history.pushState({ scrollY: 0, fromPath: path, fromSearch: window.location.search }, '', toHref(nextPath) + search);
@@ -86,9 +90,15 @@ function AppShell() {
     completeNavigation(nextPath);
   }
 
+  function navigate(nextPath: string, search = ''): void {
+    requestAppNavigation(() => performNavigation(nextPath, search));
+  }
+
   function handleBack(): void {
-    if (inAppNavCount.current > 0) window.history.back();
-    else navigate(fallbackParentPath(path));
+    requestAppNavigation(() => {
+      if (inAppNavCount.current > 0) window.history.back();
+      else performNavigation(fallbackParentPath(path));
+    });
   }
 
   function handleInternalLink(event: MouseEvent<HTMLDivElement>): void {
@@ -117,7 +127,7 @@ function AppShell() {
   }, [path]);
 
   return (
-    <div onClickCapture={handleInternalLink} className="app-shell mx-auto flex min-h-dvh w-full max-w-[1024px] flex-col md:grid md:grid-cols-[7rem_minmax(0,1fr)] md:grid-rows-[auto_minmax(0,1fr)]">
+    <div onClickCapture={handleInternalLink} className="app-shell mx-auto flex min-h-dvh w-full max-w-[1280px] flex-col md:grid md:grid-cols-[7rem_minmax(0,1fr)] md:grid-rows-[auto_minmax(0,1fr)] xl:grid-cols-[8rem_minmax(0,1fr)]">
       <a href="#main-content" className="skip-link" onClick={() => window.requestAnimationFrame(() => mainRef.current?.focus())}>跳至主要內容</a>
       <aside className="hidden border-r border-teal-100 bg-white/85 md:sticky md:top-0 md:row-span-2 md:flex md:h-dvh md:flex-col md:px-3 md:py-5">
         <a href={toHref('/')} className="mb-7 flex flex-col items-center gap-2 rounded-2xl px-2 py-3 text-center text-teal-900 transition-colors hover:bg-teal-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2">
@@ -153,7 +163,7 @@ function AppShell() {
         </div>
       </header>
       <main ref={mainRef} id="main-content" tabIndex={-1} className="min-w-0 flex-1 px-4 py-5 pb-28 outline-none md:col-start-2 md:px-8 md:py-7 md:pb-10">
-        <div key={path} className="page-content-enter min-w-0">
+        <Suspense fallback={<div className="page-section" role="status">正在開啟頁面…</div>}><div key={path} className="page-content-enter min-w-0">
           {path === '/' ? (
             <HomePage />
           ) : path === '/add' ? (
@@ -175,10 +185,12 @@ function AppShell() {
             <TrashPage />
           ) : path.startsWith('/items/') ? (
             <ItemDetailPage itemId={decodeURIComponent(path.split('/').pop() ?? '')} />
+          ) : import.meta.env.DEV && path === '/ui-preview' ? (
+            <UiPreviewPage />
           ) : (
             <div className="page-surface p-6"><h2 className="font-semibold text-slate-900">功能殼層已就緒</h2><p className="mt-2 text-sm leading-6 text-slate-600">本地 IndexedDB、照片處理、同步與家庭權限相關路由已依 Spec Kit 任務規劃接上。</p></div>
           )}
-        </div>
+        </div></Suspense>
       </main>
       <nav aria-label="手機主要導覽" className="safe-bottom fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-teal-100 bg-white/95 px-2 pt-2 shadow-[0_-8px_24px_rgb(15_118_110/0.1)] backdrop-blur md:hidden">
         {bottomNavRoutes.map((route) => {

@@ -11,4 +11,9 @@ describe('search URL state', () => {
   it('rejects unknown status values', () => {
     expect(parseSearchFilters('?status=owner&q=test')).toMatchObject({ query: 'test', status: 'all' });
   });
+
+  it('preserves non-default sorting and view while omitting defaults', () => {
+    expect(parseSearchFilters('?sort=name-asc&view=list')).toMatchObject({ sort: 'name-asc', view: 'list' });
+    expect(serializeSearchFilters({ sort: 'updated-desc', view: 'grid' })).toBe('');
+  });
 });

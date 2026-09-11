@@ -5,7 +5,9 @@ import { collectDescendantLocationIds } from '../locations/locationTree';
 import { indexItemText, textMatches } from './searchIndex';
 import type { Item, ItemStatus, Location, Tag } from '../../domain/types';
 
-export interface SearchFilters { query?: string; category?: string; tagIds?: string[]; locationId?: string; includeDescendants?: boolean; status?: ItemStatus | 'all'; createdFrom?: string; createdTo?: string; }
+export type SearchSort = 'updated-desc' | 'created-desc' | 'name-asc';
+export type SearchView = 'grid' | 'list';
+export interface SearchFilters { query?: string; category?: string; tagIds?: string[]; locationId?: string; includeDescendants?: boolean; status?: ItemStatus | 'all'; createdFrom?: string; createdTo?: string; sort?: SearchSort; view?: SearchView; }
 export interface SearchResult { item: Item; location?: Location; tags: Tag[]; }
 
 export async function searchItems(householdId: string, filters: SearchFilters = {}): Promise<SearchResult[]> {
@@ -15,7 +17,7 @@ export async function searchItems(householdId: string, filters: SearchFilters = 
   const tagIdsByItem = new Map<string, Set<string>>();
   for (const row of itemTags) tagIdsByItem.set(row.itemId, new Set([...(tagIdsByItem.get(row.itemId) ?? []), row.tagId]));
   const allowedLocationIds = filters.locationId ? new Set(filters.includeDescendants === false ? [filters.locationId] : collectDescendantLocationIds(locations, filters.locationId)) : undefined;
-  return items.filter((item) => {
+  const results = items.filter((item) => {
     const itemTagIds = tagIdsByItem.get(item.id) ?? new Set<string>();
     const itemTagsForIndex = [...itemTagIds].map((id) => tagById.get(id)).filter((tag): tag is Tag => Boolean(tag));
     if (filters.category?.trim() && item.category.toLocaleLowerCase() !== filters.category.trim().toLocaleLowerCase()) return false;
@@ -27,4 +29,13 @@ export async function searchItems(householdId: string, filters: SearchFilters = 
     if (filters.createdTo && createdDate > filters.createdTo) return false;
     return textMatches(indexItemText(item, itemTagsForIndex, locationById.get(item.currentLocationId)), filters.query ?? '');
   }).map((item) => ({ item, location: locationById.get(item.currentLocationId), tags: [...(tagIdsByItem.get(item.id) ?? [])].map((id) => tagById.get(id)).filter((tag): tag is Tag => Boolean(tag)) }));
+  const sort = filters.sort ?? 'updated-desc';
+  return results.sort((left, right) => {
+    const compared = sort === 'name-asc'
+      ? left.item.normalizedName.localeCompare(right.item.normalizedName, 'zh-TW')
+      : sort === 'created-desc'
+        ? right.item.createdAt.localeCompare(left.item.createdAt)
+        : right.item.updatedAt.localeCompare(left.item.updatedAt);
+    return compared || left.item.id.localeCompare(right.item.id);
+  });
 }

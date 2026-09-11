@@ -20,4 +20,15 @@ describe('offline local search', () => {
     expect(results[0].location?.path).toBe('Kitchen / Utensil drawer');
     expect(await searchItems('household-1', { query: 'garden', locationId: room.id })).toHaveLength(0);
   });
+
+  it('sorts deterministically by update time, creation time, and name', async () => {
+    const location = await createLocation({ householdId: 'household-sort', name: '櫃子', type: 'cabinet' });
+    const alpha = await createItem({ householdId: 'household-sort', createdBy: 'u1', updatedBy: 'u1', deviceId: 'd1', name: 'Alpha', category: '其他', currentLocationId: location.id, notes: '', tagNames: [] });
+    const beta = await createItem({ householdId: 'household-sort', createdBy: 'u1', updatedBy: 'u1', deviceId: 'd1', name: 'Beta', category: '其他', currentLocationId: location.id, notes: '', tagNames: [] });
+    await db.items.update(alpha.itemId, { createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-03-01T00:00:00.000Z' });
+    await db.items.update(beta.itemId, { createdAt: '2026-02-01T00:00:00.000Z', updatedAt: '2026-02-01T00:00:00.000Z' });
+    expect((await searchItems('household-sort', { sort: 'updated-desc' })).map((row) => row.item.name)).toEqual(['Alpha', 'Beta']);
+    expect((await searchItems('household-sort', { sort: 'created-desc' })).map((row) => row.item.name)).toEqual(['Beta', 'Alpha']);
+    expect((await searchItems('household-sort', { sort: 'name-asc' })).map((row) => row.item.name)).toEqual(['Alpha', 'Beta']);
+  });
 });

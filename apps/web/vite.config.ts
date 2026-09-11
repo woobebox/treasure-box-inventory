@@ -7,6 +7,18 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig(({ mode }) => ({
   base: mode === 'production' ? '/treasure-box-inventory/' : '/',
   plugins: [react(), tailwindcss()],
+  build: {
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            { name: 'supabase', test: /node_modules[\\/]@supabase[\\/]/ },
+            { name: 'dexie', test: /node_modules[\\/]dexie[\\/]/ },
+          ],
+        },
+      },
+    },
+  },
   test: {
     environment: 'jsdom',
     globals: true,
