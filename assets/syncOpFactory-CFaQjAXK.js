@@ -1,0 +1,1 @@
+import{g as e,v as t}from"./index-DyN9lK5E.js";function n(n){let r=t();return{id:e(),status:`pending`,retryCount:0,createdAt:r,updatedAt:r,...n}}export{n as t};
