@@ -85,7 +85,43 @@ npm run dev
 
 > 部署到 GitHub Pages 等靜態主機時，這兩個變數要在建置環境（CI secrets / build env）提供，因為 Vite 會在 `npm run build` 時把它們編譯進前端產物。
 
-## 6. 煙霧測試（跨裝置同步）
+## 6. Google＋Email／密碼登入設定
+
+Email／密碼登入及開放註冊保留。新增 Google 登入使用 Supabase SDK PKCE，同一分頁跳轉，回跳至 App 根入口。Google 新帳號沒有預設密碼；本版不提供設定密碼或跨信箱手動綁定。
+
+### Google Auth Platform
+
+1. 建立或選擇 Google Cloud 專案，設定應用程式名稱、聯絡信箱、隱私權政策及 Audience。測試階段將實際驗收帳號加入 Test users；對外開放前依 Google 控制台要求完成發布／品牌驗證。
+2. Data Access 僅設定 `openid`、`userinfo.email`、`userinfo.profile`，不要求 Gmail、Drive 或其他資料權限。
+3. 建立 Web application OAuth client。Authorized JavaScript origins 填 `https://woobebox.github.io`；需要本機驗收時另列 `http://localhost:5173`。
+4. Authorized redirect URIs 使用 **Supabase → Authentication → Sign In / Providers → Google** 顯示的 callback URL（通常為 `https://<project-ref>.supabase.co/auth/v1/callback`）。這裡不是 GitHub Pages 網址；使用自訂 Supabase 網域時也以 provider 頁面實值為準。
+5. 在 Supabase Google provider 啟用 Google，填入 Client ID／Client Secret。Secret 僅留在 provider 設定；不得放入 `VITE_*`、GitHub 前端建置變數或版本庫。不要停用 nonce、JWT 或 RLS 檢查。
+
+### Supabase URL Configuration
+
+| 設定 | 完整網址 |
+|------|----------|
+| Site URL | `https://woobebox.github.io/treasure-box-inventory/` |
+| 正式 Redirect URL | `https://woobebox.github.io/treasure-box-inventory/` |
+| 本機 Redirect URL（僅測試需要時） | `http://localhost:5173/` |
+
+正式 allowlist 使用精確網址，不以 `**` 開放任意回跳。若本機改用 `127.0.0.1` 或不同 port，需另列該次完整入口網址；不要混用 origin。前端以 `window.location.origin`＋`BASE_URL` 組合 Google `redirectTo` 與 Email `emailRedirectTo`，不接受 URL 中提供的任意目的地。
+
+PKCE 授權碼由 SDK 自動交換，前端不另呼叫 `exchangeCodeForSession`。Google 流程需在原瀏覽器完成；缺少 verifier、授權碼過期／重用、拒絕授權時會清理 callback 參數並提供中文重試訊息。Email 在其他裝置完成驗證但未取得 session 時，使用原 Email／密碼登入即可，無需重新註冊；舊 implicit 驗證連結也可能需要重新用密碼登入。
+
+### 帳號銜接與真實驗收
+
+- 已驗證 Email 帳號使用相同信箱 Google 登入：由 Supabase 自動 identity linking，必須確認原 `user.id`、家庭、物品與角色不變。不要在前端以 email 自行改寫 user_id 或複製家庭。
+- 不同信箱：不同帳號；不得看到另一帳號家庭或被自動加入家庭。Google 新帳號無家庭時進入既有建立家庭流程。
+- 先 Google 註冊的帳號不會因此具備密碼；相同信箱再次按 Email 註冊不能視為成功建立密碼，應使用 Google 入口。
+- admin／member 權限必須以 `household_members` 的真實 active membership 驗收；切換帳號、登出及重新整理皆不可沿用舊家庭。家庭讀取失敗應能重試／登出。
+- 分別驗收 Email 密碼登入、同瀏覽器及跨裝置 Email 驗證、Google 成功／取消、相同信箱銜接、不同信箱隔離、手機及平板；瀏覽器 console／應用程式日誌不得記錄授權碼、token 或原始 provider 錯誤。
+
+本機測試僅證明程式行為。Google／Supabase 控制台設定、實際同帳號銜接及裝置 UAT 需另附環境與結果，未通過前不得宣告 Google 登入已可使用。前端發布不會自動完成 Google provider 或回跳設定；本次未執行控制台修改。
+
+官方文件：[Google 登入](https://supabase.com/docs/guides/auth/social-login/auth-google)、[PKCE](https://supabase.com/docs/guides/auth/sessions/pkce-flow)、[Identity linking](https://supabase.com/docs/guides/auth/auth-identity-linking)、[Redirect URLs](https://supabase.com/docs/guides/auth/redirect-urls)。
+
+## 7. 煙霧測試（跨裝置同步）
 
 1. 用兩個瀏覽器（或兩台裝置）登入同一個帳號 / 同一個 household。
 2. 裝置 A：新增一個物品、新增/編輯一個位置。

@@ -1,7 +1,7 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
-at .specify/features/002-mobile-ux-uplift/plan.md
+at .specify/features/006-google-login/plan.md
 <!-- SPECKIT END -->
 
 ## Spec Kit Slash Command Routing

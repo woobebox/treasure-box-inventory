@@ -32,6 +32,8 @@ export interface HouseholdContextValue {
   households: Household[];
   currentMember?: HouseholdMember;
   isReady: boolean;
+  error: string;
+  retry: () => void;
   selectHousehold: (id: string) => void;
   createHousehold: (name: string) => Promise<Household>;
 }

@@ -8,6 +8,7 @@ import { useHousehold } from '../services/householdContextValue';
 import { useAutoSync } from '../sync/useSyncStatus';
 import { LoginPage } from '../features/auth/LoginPage';
 import { HouseholdOnboarding } from '../features/households/HouseholdOnboarding';
+import { Button } from '../components/ui';
 import { requestAppNavigation } from './navigationRequest';
 
 const AddItemPage = lazy(() => import('../features/items/AddItemPage').then((module) => ({ default: module.AddItemPage })));
@@ -44,6 +45,7 @@ export function App() {
   if (supabase) {
     if (isLoading) return <CenteredNotice text="載入中…" />;
     if (!user) return <LoginPage />;
+    if (household.error) return <HouseholdLoadError />;
     if (!household.isReady) return <CenteredNotice text="載入家庭資料…" />;
     if (!household.householdId) return <HouseholdOnboarding />;
   }
@@ -52,6 +54,18 @@ export function App() {
 
 function CenteredNotice({ text }: { text: string }) {
   return <main className="flex min-h-dvh items-center justify-center p-6 text-sm text-slate-600">{text}</main>;
+}
+
+function HouseholdLoadError() {
+  const household = useHousehold();
+  const { signOut } = useAuth();
+  const [signOutError, setSignOutError] = useState('');
+  const [busy, setBusy] = useState(false);
+  async function logout() {
+    setBusy(true);
+    try { await signOut(); } catch { setSignOutError('登出失敗，請重試。'); } finally { setBusy(false); }
+  }
+  return <main className="flex min-h-dvh items-center justify-center p-6"><div className="page-surface max-w-lg space-y-4 p-6"><p role="alert">{signOutError || household.error}</p><Button onClick={household.retry} disabled={busy}>重新載入</Button><Button variant="ghost" busy={busy} onClick={() => void logout()}>登出</Button></div></main>;
 }
 
 // Default parent page when a non-top-level route was opened without in-app

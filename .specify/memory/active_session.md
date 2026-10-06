@@ -1,9 +1,9 @@
 # Current Session Progress
 
-- **Current Active Feature**: `005-inventory-flow-optimization`（`.specify/feature.json` 已切換）
-- **Latest Verified Action**: 2026-09-09 — 依 005 完成物品編輯、連續新增、文字草稿與站內離開保護、搜尋排序／清單、首頁操作前移、語意 UI 元件、開發預覽、路由拆分及 1280px 寬平板 shell。
-- **Current Blockers**: 自動檢查與 375／768／1024 瀏覽器驗收通過；目前 UI 工具無法切換 200% browser zoom 與 reduced-motion 模擬，005 T013 因此維持未完成。正式 Supabase 雙裝置同步仍需部署環境驗收。
-- **Next Best Action**: 推送 005 commit 至 `origin/main` 並確認 Web CI／GitHub Pages；再以正式裝置補做 200% zoom、reduced-motion 及雙裝置 item.update/tag sync。
+- **Current Active Feature**: `006-google-login`（`.specify/feature.json` 已切換；005 待驗收項目保留）
+- **Latest Verified Action**: 2026-10-06 — 完成 Google＋Email／密碼雙入口、PKCE 與 callback 錯誤清理、帳號家庭隔離、真實雲端 membership 角色；35 files／100 tests、typecheck、lint、build、diff check 及三 viewport 本機 smoke 通過。
+- **Current Blockers**: Google／Supabase provider、精確回跳網址、真實 OAuth／Email 驗證、同信箱原 user.id 銜接與 PWA／雙裝置 UAT 尚未完成，006 T009 保持未勾。005 的 200% zoom／reduced-motion／正式同步驗收仍待完成。
+- **Next Best Action**: 使用者已授權 commit／push 驅動更新；先提交 006 並推送 main，確認 Web CI／Pages 結果，再依部署文件第 6 節完成 provider／URL 與真實登入 UAT。
 
 ## Session Memory Routine（依使用者要求 2026-06-29）
 
@@ -12,6 +12,29 @@
 - 本檔即為跨 session 記憶來源；`AGENTS.md` 規則 1 與 5 已涵蓋此流程。
 
 ## Session Log
+
+### 2026-10-06 006 commit／push 更新準備
+
+- **Completed Action**: 使用者已明確授權 `git commit && git push` 驅動更新。確認分支 main、origin 指向 woobebox/treasure-box-inventory，`git fetch origin` 成功，HEAD 與 origin/main 為 0／0；推送 apps/web 變更會觸發 Web CI 與 GitHub Pages。僅提交 006 功能、測試、Spec Kit／設定文件與本次 session 內容，原有 005 部署歷史／課堂紀錄的未提交變更保留在工作區。
+- **Verification**: `git diff --check` 通過；沿用本次已完成的 100 tests、typecheck、lint、build 與三 viewport smoke，不因文件調整重跑產品測試。GitHub API sandbox 查詢連線失敗，核准網路存取後確認預設分支 main。
+- **Current Blockers**: 提交／推送與 Actions 結果待執行；Google provider／真實登入 T009 仍 pending。
+- **Next Best Action**: 建立 006 scoped commit、推送 origin/main，驗證同 commit 的 CI／Pages run，再更新本機 session 結果。
+
+### 2026-10-06 006 Google＋Email／密碼雙登入本機實作
+
+- **Completed Action**: 按已批准方案建立 006 spec／plan／tasks／quickstart 並切換 active feature。Google 按鈕位於 Email form 外，兩入口共用防重入 lock，處理 Browser Back 的 bfcache 解鎖；Email 登入／註冊保留，驗證回跳明確指定 BASE_URL 根入口。Supabase client 採 PKCE 與 SDK 自動交換，初始化取得 callback 結果後清理 URL，以中文安全指引處理拒絕／失效／缺 verifier。AuthContext 新增 loginError，HouseholdContext 新增 error／retry。
+- **Completed Action**: 家庭 provider 依 user.id remount，登入／登出／換帳號不暴露舊家庭，過期雲端請求不能更新新 state。家庭載入完成前阻擋 shell；錯誤可重試／登出。新增真實 active membership 查詢，本機原預設 admin 改由雲端 role／id 覆寫，新家庭 RPC 後也查驗 membership；不變更 schema、RLS、JWT 或同步協定。保留原 active_session 未提交內容與課堂紀錄。
+- **Verification**: 最終 `npm run typecheck`、`npm run lint`（0 warnings）、`npm run test`（35 files／100 tests）、`npm run build`、`git diff --check` 通過。新增 6 test files／29 tests；jsdom 僅輸出既有 `Window.scrollTo()` 未實作資訊。首次 typecheck 因測試 `getByRole` 不支援 `exact` 選項失敗，修正後通過；首次 lint 的 ref cleanup 警告修正後清除。
+- **Browser Verification**: 虛構 Supabase 設定下，375×812、768×1024、1024×768 無水平 overflow；雙入口／註冊切換、Google → Email 鍵盤順序、拒絕授權與缺 verifier 的中文指引／URL 清理通過，console 無 error／warning。首次測試啟動命令 `VITE_SUPABASE_URL=https://auth-smoke.invalid VITE_SUPABASE_ANON_KEY=dummy-public-smoke-key npm --prefix apps/web run dev -- --host 127.0.0.1 --port 5178 --strictPort` 因 `listen EPERM 127.0.0.1:5178` 失敗，監聽權限核准後成功。舊錯誤分頁 data URL reload 受工具政策阻擋，以就緒的原始 HTTP 網址新分頁驗收。沒有提交登入表單或使用 production 憑證。
+- **Current Blockers**: 未修改 Google／Supabase 控制台或驗證真實 OAuth、Email 信件、同信箱 identity linking／原 user.id、PWA／雙裝置；T009 保持 pending。本機通過不等於正式上線。005 實機驗收待辦未勾選。
+- **Next Best Action**: 依部署文件第 6 節設定 provider／精確 redirect，再依 006 quickstart 完成外部 UAT；此次未 commit、push 或部署。
+
+### 2026-10-06 Google 登入可行性檢視
+
+- **Completed Action**: 檢視現有 LoginPage、AuthProvider、supabaseClient、App 登入／家庭 gate、RLS 與 active feature 005。確認目前為 Email／密碼登入，尚無 Google OAuth 按鈕；既有 Supabase session 與以 auth.uid() 判定的 active 家庭成員／admin 權限可沿用。參考網站 https://learn.duotify.com/ 確有 Login with Google；已查核 https://supabase.com/docs/guides/auth/social-login/auth-google 官方整合流程。
+- **Verification**: 僅靜態程式檢視與公開官方文件查核；未執行 `npm run typecheck`、`npm run lint`、`npm run test`、`npm run build`，原因為本次僅可行性諮詢，無 runtime 變更。未操作 Google／Supabase 控制台，未驗證真實 OAuth 登入。
+- **Current Blockers**: 尚未確認 Google provider 雲端設定、正式回跳網址、註冊政策與既有帳號銜接方式；不代表已可使用 Google 登入。保留本檔原有未提交內容及 005 驗收待辦。
+- **Next Best Action**: 決定登入方式與開放範圍後，以新 Spec Kit feature 規劃按鈕、OAuth 回跳／錯誤處理、帳號銜接、權限與登入驗收；Client Secret 僅存 Supabase provider 設定，不放入 VITE 前端變數。
 
 ### 2026-09-09 005 收納流程與 UI 維護優化
 
